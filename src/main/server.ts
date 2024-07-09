@@ -1,7 +1,7 @@
 // backend/src/main/server.ts
 
 import { App } from './app';
-import * as dotenv from 'dotenv';
+import * as dotenv from 'dotenv'; //allows accessing all functionalities and constants provided by dotenv
 import { connectDB } from '../infrastructure/database/mongoDB';
 
 dotenv.config();
@@ -19,3 +19,9 @@ connectDB()
   .catch((error) => {
     console.error('Failed to connect to MongoDB', error);
   });
+
+
+// App
+// Encapsulation: 
+// Reusability: testing ,versioning,microservices,Muti Env (dev,pdtn)
+// Structure: 
