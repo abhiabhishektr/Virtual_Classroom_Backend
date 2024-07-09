@@ -6,6 +6,10 @@
 │   ├── infrastructure
 │   │   └── database
 │   │       └── mongoDB.ts
+│   │       └── models
+│   │           ├── User.ts
+│   │           ├── Teacher.ts
+│   │           └── Classroom.ts
 │   ├── interfaces
 │   │   ├── middlewares
 │   │   │   └── errorHandler.ts
@@ -28,11 +32,15 @@
 │       │   │   ├── registerUser.ts
 │       │   │   └── verifyOTP.ts
 │       │   └── profile
-│       │       ├── viewProfile.ts
-│       │       └── editProfile.ts
+│       │   │   ├── viewProfile.ts
+│       │   │   └── editProfile.ts
+│       │   └── classroom
+│       │       ├── startClassroom.ts
+│       │       └── joinClassroom.ts
 │       ├── services
 │       │   ├── notificationService.ts
 │       │   └── chatService.ts
+│       │   └── authService.ts
 │       └── repositories
 │           ├── userRepository.ts
 │           ├── teacherRepository.ts

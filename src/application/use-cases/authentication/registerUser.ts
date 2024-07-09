@@ -15,3 +15,5 @@ export const registerUser = async ({ email, password, name }: RegisterUserInput)
   const tokens = authService.generateTokens(user);
   return { user, tokens };
 };
+
+
