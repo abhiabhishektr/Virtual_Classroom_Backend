@@ -10,6 +10,20 @@ import profileRoutes from '../interfaces/routes/profileRoutes';
 import classroomRoutes from '../interfaces/routes/classroomRoutes';
 import notificationRoutes from '../interfaces/routes/notificationRoutes';
 
+
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: string;
+        name: string;
+        // add other properties as needed
+      };
+    }
+  }
+}
+
 export class App {
   public app: Application;
 
