@@ -10,4 +10,9 @@ router.post('/login', loginUser);
 router.post('/logout', logoutUser);
 router.post('/verify-otp', verifyOTP);
 
+router.get('/test', (req, res) => {
+    res.send('Hello, testing route!');
+  });
+  
+
 export default router;

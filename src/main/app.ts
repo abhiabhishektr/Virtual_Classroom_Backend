@@ -7,8 +7,8 @@ import { errorHandler } from '../interfaces/middlewares/errorHandler';
 import { authMiddleware } from '../interfaces/middlewares/authMiddleware';
 import authenticationRoutes from '../interfaces/routes/authenticationRoutes';
 import profileRoutes from '../interfaces/routes/profileRoutes';
-import classroomRoutes from '../interfaces/routes/classroomRoutes';
-import notificationRoutes from '../interfaces/routes/notificationRoutes';
+// import classroomRoutes from '../interfaces/routes/classroomRoutes';
+// import notificationRoutes from '../interfaces/routes/notificationRoutes';
 
 
 
@@ -43,8 +43,8 @@ export class App {
   private configureRoutes(): void {
     this.app.use('/api/auth', authenticationRoutes);
     this.app.use('/api/profile', authMiddleware, profileRoutes);
-    this.app.use('/api/classroom', authMiddleware, classroomRoutes);
-    this.app.use('/api/notifications', authMiddleware, notificationRoutes);
+    // this.app.use('/api/classroom', authMiddleware, classroomRoutes);
+    // this.app.use('/api/notifications', authMiddleware, notificationRoutes);
   }
 
   private setupErrorHandling(): void {
