@@ -9,7 +9,10 @@ import authenticationRoutes from '../interfaces/routes/authenticationRoutes';
 import profileRoutes from '../interfaces/routes/profileRoutes';
 // import classroomRoutes from '../interfaces/routes/classroomRoutes';
 // import notificationRoutes from '../interfaces/routes/notificationRoutes';
-
+// -----------------
+import {adminMiddleware} from '../interfaces/middlewares/adminMiddleware';
+import adminUserRoutes from '../interfaces/routes/admin/adminUserRoutes';
+// -----------------
 
 
 declare global {
@@ -36,7 +39,7 @@ export class App {
 
   private configureMiddleware(): void {
     this.app.use(cors());
-    this.app.use(morgan('dev'));
+    this.app.use(morgan('dev')); //  dev-log format  
     this.app.use(express.json());
   }
 
@@ -45,6 +48,8 @@ export class App {
     this.app.use('/api/profile', authMiddleware, profileRoutes);
     // this.app.use('/api/classroom', authMiddleware, classroomRoutes);
     // this.app.use('/api/notifications', authMiddleware, notificationRoutes);
+    // --------admin routes-----------
+    this.app.use('/api/admin', adminMiddleware, adminUserRoutes);
   }
 
   private setupErrorHandling(): void {
