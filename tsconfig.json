@@ -6,11 +6,12 @@
         "strict": true,
         "esModuleInterop": true,
         "useUnknownInCatchVariables": true,
-        "typeRoots": ["./node_modules/@types", "./src"]
+        "typeRoots": ["./node_modules/@types", "./src"],
+        "types": ["node"]
     },
     "include": [
         "src/**/*.ts"
-    ],
+, "src/interfaces/controllers/googleAuth.ts"    ],
     "exclude": [
         "node_modules"
     ]

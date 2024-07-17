@@ -10,4 +10,5 @@ interface EditProfileInput {
 
 export const editProfile = async (user: any, changes: EditProfileInput) => {
   return userRepository.update(user.id, changes);
+  // return userRepository.findById(user.id);
 };

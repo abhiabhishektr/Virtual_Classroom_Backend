@@ -11,19 +11,21 @@
 │   │           ├── Teacher.ts
 │   │           └── Classroom.ts
 │   ├── interfaces
-│   │   ├── middlewares
-│   │   │   └── errorHandler.ts
-│   │   │   └── authMiddleware.ts
-│   │   ├── routes
-│   │   │   ├── authenticationRoutes.ts
-│   │   │   ├── profileRoutes.ts
-│   │   │   ├── classroomRoutes.ts
-│   │   │   └── notificationRoutes.ts
-│   │   └── controllers
-│   │       ├── authenticationController.ts
-│   │       ├── profileController.ts
-│   │       ├── classroomController.ts
-│   │       └── notificationController.ts
+│   │    ├── middlewares
+│   │    │   ├── errorHandler.ts
+│   │    │   └── authMiddleware.ts
+│   │    ├── routes
+│   │    │   ├── authenticationRoutes.ts
+│   │    │   ├── profileRoutes.ts
+│   │    │   ├── classroomRoutes.ts
+│   │    │   └── notificationRoutes.ts
+│   │    ├── controllers
+│   │    │   ├── authenticationController.ts
+│   │    │   ├── profileController.ts
+│   │    │   ├── classroomController.ts
+│   │    │   └── notificationController.ts
+│   │    └── dtos
+│   │        └── UserDTO.ts
 │   └── application
 │       ├── use-cases
 │       │   ├── authentication
@@ -31,6 +33,7 @@
 │       │   │   ├── logoutUser.ts
 │       │   │   ├── registerUser.ts
 │       │   │   └── verifyOTP.ts
+│       │   │   └── otpService.ts
 │       │   └── profile
 │       │   │   ├── viewProfile.ts
 │       │   │   └── editProfile.ts
@@ -41,10 +44,21 @@
 │       │   ├── notificationService.ts
 │       │   └── chatService.ts
 │       │   └── authService.ts
-│       └── repositories
-│           ├── userRepository.ts
-│           ├── teacherRepository.ts
-│           └── classroomRepository.ts
+│       │── repositories
+│       │   ├── userRepository.ts
+│       │   ├── teacherRepository.ts
+│       │   └── classroomRepository.ts
 ├── .env
 ├── package.json
 └── tsconfig.json
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
