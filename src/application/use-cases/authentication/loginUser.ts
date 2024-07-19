@@ -2,6 +2,8 @@
 
 import { userRepository } from '../../repositories/userRepository';
 import { authService } from '../../services/authService';
+import { IUser  } from '../../../infrastructure/database/models/User'; 
+ 
 
 interface LoginUserInput {
   email: string;
@@ -25,10 +27,22 @@ export const loginUser = async ({ email, password }: LoginUserInput) => {
   }
 
   const tokens = authService.generateTokens(user);
-  return { user, tokens };
+  return { tokens };
 };
 
 
+// ------------------veriffy OTP making db change true----------------
+
+export const updateIsVerifiedUseCase = async (userId: string, changes: Partial<IUser>): Promise<IUser | null> => {
+  // Update updatedAt field
+  changes.updatedAt = new Date();
+
+  // Call repository method to update user
+  const updatedUser = await userRepository.updateViaEmail(userId, changes);
+  console.log('updatedUser', updatedUser);
+  
+  return updatedUser;
+};
 // ------------------admin login ----------------
 
 
@@ -63,13 +77,14 @@ export const googleLoginUser = async ({ email, profile }: GoogleLoginParams) => 
   const user = await userRepository.findByEmail(email);
 
   if (!user) {
-    // throw new Error('User not found');
+    throw new Error('User not found');
     
   }
 
 
- 
+  const tokens = authService.generateTokens(user);
+
 
   // const tokens = authService.generateTokens(user);
-  // return { user, tokens };
+  return { user, tokens };
 };

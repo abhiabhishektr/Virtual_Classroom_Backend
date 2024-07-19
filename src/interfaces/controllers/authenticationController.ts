@@ -1,7 +1,8 @@
-// backend/src/interfaces/controllers/authenticationController.ts
+                                                 // backend/src/interfaces/controllers/authenticationController.ts
 
 import { Request, Response } from 'express';
 import { loginUser as loginUserUseCase } from '../../application/use-cases/authentication/loginUser';
+import { updateIsVerifiedUseCase as updateIsVerified} from '../../application/use-cases/authentication/loginUser';
 import { loginAdmin as loginAdminUseCase } from '../../application/use-cases/authentication/loginUser';
 import { logoutUser as logoutUserUseCase } from '../../application/use-cases/authentication/logoutUser';
 import { registerUser as registerUserUseCase } from '../../application/use-cases/authentication/registerUser';
@@ -56,10 +57,20 @@ export const verifyOTP = async (req: Request, res: Response) => {
   try {
     const result = await verifyOTPUseCase(req.body.email, req.body.otp);
     if (result) {
-      res.status(200).json({ message: 'OTP verified successfully' });
+      // amke isverifed true here
+     let user = await updateIsVerified(req.body.email, { isVerified: true });
+      res.status(200).json({ message: 'OTP verified successfully',user });
     } else {
     res.status(400).json({ message: 'Invalid OTP' });
     }
+    
+  } catch (error : any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const resendOTP = async (req: Request, res: Response) => {
+  try {
     
   } catch (error : any) {
     res.status(400).json({ message: error.message });

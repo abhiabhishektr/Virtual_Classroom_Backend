@@ -13,16 +13,12 @@ import profileRoutes from '../interfaces/routes/profileRoutes';
 import {adminMiddleware} from '../interfaces/middlewares/adminMiddleware';
 import adminUserRoutes from '../interfaces/routes/admin/adminUserRoutes';
 // -----------------
-
+import { User } from '../types/user';
 
 declare global {
   namespace Express {
     interface Request {
-      user?: {
-        id: string;
-        name: string;
-        // add other properties as needed
-      };
+      user?: User; // Ensure User type is correctly defined and imported
     }
   }
 }

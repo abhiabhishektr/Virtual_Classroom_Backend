@@ -16,8 +16,11 @@ const findByEmail = async (email: string): Promise<IUser | null> => {
 const create = async (userData: Partial<IUser>): Promise<IUser> => {
   // Check if email is already registered
   const existingUser = await User.findOne({ email: userData.email });
-  if (existingUser) {
+  if (existingUser && existingUser.isVerified) {
     throw new Error('User already exists');
+  }
+  if (existingUser && !existingUser.isVerified) {
+    return existingUser;
   }
 
   const user = new User(userData);
@@ -33,6 +36,11 @@ const update = async (id: string, changes: Partial<IUser>): Promise<IUser | null
   changes.updatedAt = new Date();
 
   return await User.findByIdAndUpdate(id, changes, { new: true }).exec();
+};
+
+const updateViaEmail = async (email: string, changes: Partial<IUser>): Promise<IUser | null> => {
+  changes.updatedAt = new Date();
+  return await User.findOneAndUpdate({ email }, changes, { new: true }).exec();
 };
 
 const getAllUsers = async (): Promise<UserDTO[]> => {
@@ -55,6 +63,8 @@ const unblockUser = async (email: string): Promise<void> => {
   await User.findOneAndUpdate({ email }, { blocked: false }, { new: true }).exec();
 };
 
+
+
 export const userRepository = {
   findByEmail,
   create,
@@ -63,5 +73,6 @@ export const userRepository = {
   getAllUsers,
   blockUser,
   unblockUser,
+  updateViaEmail
   // Add other repository methods as needed
 };
