@@ -3,6 +3,7 @@
 │   ├── main
 │   │   ├── server.ts
 │   │   └── app.ts
+│   │   └── redisClient.ts
 │   ├── infrastructure
 │   │   └── database
 │   │       └── mongoDB.ts
@@ -31,7 +32,7 @@
 │       │   ├── authentication
 │       │   │   ├── loginUser.ts
 │       │   │   ├── logoutUser.ts
-│       │   │   ├── registerUser.ts
+│       │   │   ├── registerUser.ts   
 │       │   │   └── verifyOTP.ts
 │       │   │   └── otpService.ts
 │       │   └── profile

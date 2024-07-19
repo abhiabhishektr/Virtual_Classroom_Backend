@@ -8,6 +8,7 @@ export interface IUser extends Document {
   name: string;
   isAdmin: boolean;
   blocked: boolean;
+  isVerified: boolean;
   profilePicture?: string; // Optional field for profile picture URL
   createdAt: Date; // Date of user creation
   updatedAt: Date; // Date of last update
@@ -20,6 +21,7 @@ const userSchema = new Schema<IUser>({
   name: { type: String, required: true },
   isAdmin: { type: Boolean, default: false },
   blocked: { type: Boolean, default: false },
+  isVerified: { type: Boolean, default: false },
   profilePicture: { type: String }, // Optional field for profile picture URL
   createdAt: { type: Date, default: Date.now }, // Default to current date/time
   updatedAt: { type: Date, default: Date.now }, // Default to current date/time
