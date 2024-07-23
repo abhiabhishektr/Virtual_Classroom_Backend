@@ -2,8 +2,8 @@
 
 import { userRepository } from '../../repositories/userRepository';
 import { authService } from '../../services/authService';
-import { IUser  } from '../../../infrastructure/database/models/User'; 
- 
+import { IUser } from '../../../infrastructure/database/models/User';
+
 
 interface LoginUserInput {
   email: string;
@@ -11,7 +11,7 @@ interface LoginUserInput {
 }
 
 interface GoogleLoginParams {
-  email: string ;
+  email: string;
   profile: object; // Adjust to the actual shape of profile if known
 }
 
@@ -22,14 +22,25 @@ export const loginUser = async ({ email, password }: LoginUserInput) => {
     throw new Error('User not found');
   }
 
-  if (! await authService.verifyPassword(password, user.password)) {    
+  if (! await authService.verifyPassword(password, user.password)) {
     throw new Error('Invalid email or password');
   }
 
   const tokens = authService.generateTokens(user);
+  
   return { tokens };
 };
 
+
+export const userExists = async (email: string) => {
+  console.log('email', email);
+  
+  const user = await userRepository.findByEmail(email);
+  if (user) {
+    return true
+  }else false
+  // return user;
+};
 
 // ------------------veriffy OTP making db change true----------------
 
@@ -40,16 +51,16 @@ export const updateIsVerifiedUseCase = async (userId: string, changes: Partial<I
   // Call repository method to update user
   const updatedUser = await userRepository.updateViaEmail(userId, changes);
   console.log('updatedUser', updatedUser);
-  
+
   return updatedUser;
 };
 // ------------------admin login ----------------
 
 
-export const loginAdmin  = async ({ email, password }: LoginUserInput) => {
+export const loginAdmin = async ({ email, password }: LoginUserInput) => {
   const user = await userRepository.findByEmail(email);
   console.log('user', user);
-  
+
   if (!user) {
     throw new Error('User not found');
   }
@@ -57,11 +68,11 @@ export const loginAdmin  = async ({ email, password }: LoginUserInput) => {
   if (!user || !user.isAdmin) {
     throw new Error('Invalid credentials');
   }
-  
-  if (! await authService.verifyPassword(password, user.password)) {    
+
+  if (! await authService.verifyPassword(password, user.password)) {
     throw new Error('Invalid email or password');
   }
-  
+
   const tokens = authService.generateTokens(user);
   return { user, tokens };
 };
@@ -73,12 +84,12 @@ export const googleLoginUser = async ({ email, profile }: GoogleLoginParams) => 
 
   console.log('profile', profile);
 
-  
+
   const user = await userRepository.findByEmail(email);
 
   if (!user) {
     throw new Error('User not found');
-    
+
   }
 
 

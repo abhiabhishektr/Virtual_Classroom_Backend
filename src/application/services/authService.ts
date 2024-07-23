@@ -2,7 +2,8 @@
 
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { IUser } from '../../infrastructure/database/models/User'; 
+import { IUser } from '../../infrastructure/database/models/User';
+import { redisClient } from '../../main/redisClient';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
@@ -16,7 +17,7 @@ export const authService = {
   },
 
   verifyPassword: async (password: string, hashedPassword: string): Promise<boolean> => {
-      return await bcrypt.compare(password, hashedPassword);
+    return await bcrypt.compare(password, hashedPassword);
 
   },
 
@@ -30,19 +31,29 @@ export const authService = {
     return jwt.verify(token, JWT_SECRET);
   },
 
-  refreshToken: (refreshToken: string): { accessToken: string; refreshToken: string } | null => {
+  storeRefreshToken: async (userId: string, refreshToken: string): Promise<void> => {
+    await redisClient.set(userId, refreshToken, 'EX', 7 * 24 * 60 * 60); // Store for 7 days
+  },
+
+  refreshToken: async (refreshToken: string): Promise<{ accessToken: string; refreshToken: string } | null> => {
     try {
-      // Verify the refresh token
       const decoded = jwt.verify(refreshToken, JWT_SECRET) as { id: string };
-      
-      // Generate new tokens
+      const storedToken = await redisClient.get(decoded.id);
+
+      if (storedToken !== refreshToken) {
+        throw new Error('Invalid refresh token');
+      }
+
       const accessToken = jwt.sign({ id: decoded.id }, JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRY });
       const newRefreshToken = jwt.sign({ id: decoded.id }, JWT_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRY });
-      
+
+      await authService.storeRefreshToken(decoded.id, newRefreshToken);
       return { accessToken, refreshToken: newRefreshToken };
     } catch (error) {
-      // If verification fails, return null
       return null;
     }
   },
+  removeRefreshToken: async (userId: string): Promise<void> => {
+    await redisClient.del(userId);
+  }
 };
