@@ -34,3 +34,14 @@ export const editProfile = async (req: Request, res: Response) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+  
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+

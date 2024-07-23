@@ -1,7 +1,7 @@
 // backend/src/interfaces/routes/authenticationRoutes.ts
 
 import { Router } from 'express';
-import { registerUser, loginUser, logoutUser, verifyOTP, loginAdmin ,resendOTP } from '../controllers/authenticationController'; //refreshToken
+import { registerUser, loginUser, logoutUser, loginAdmin ,resendOTP, sendOTP ,forgotPassword,forgotPasswordOTP} from '../controllers/authenticationController'; //refreshToken,verifyOTP
 import { googleAuth, googleCallback, setupSession } from '../controllers/googleAuth'
 
 const router = Router();
@@ -9,14 +9,16 @@ const router = Router();
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/logout', logoutUser);
-router.post('/verify-otp', verifyOTP);
+router.post('/send-otp', sendOTP);
 router.post('/resend-otp', resendOTP);
+router.post('/forgot-passwordOTP', forgotPasswordOTP);
+router.post('/forgot-password', forgotPassword);
 
 
 // router.post('/refresh-token', );
-// router.post('/forgot-password', forgotPassword);
 // router.post('/reset-password', resetPassword);
-// router.post('/change-password', verifyToken, changePassword);
+
+// router.post('/verify-otp', verifyOTP);
 
 router.get('/google', googleAuth);
 router.get("/google/callback", googleCallback, setupSession);

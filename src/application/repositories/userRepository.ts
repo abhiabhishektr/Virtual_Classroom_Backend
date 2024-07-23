@@ -16,12 +16,12 @@ const findByEmail = async (email: string): Promise<IUser | null> => {
 const create = async (userData: Partial<IUser>): Promise<IUser> => {
   // Check if email is already registered
   const existingUser = await User.findOne({ email: userData.email });
-  if (existingUser && existingUser.isVerified) {
+  if (existingUser) {
     throw new Error('User already exists');
   }
-  if (existingUser && !existingUser.isVerified) {
-    return existingUser;
-  }
+  // if (existingUser && !existingUser.isVerified) {
+  //   return existingUser;
+  // }
 
   const user = new User(userData);
   return await user.save();
@@ -31,11 +31,27 @@ const findById = async (id: string): Promise<IUser | null> => {
   return await User.findById(id).exec();
 };
 
-const update = async (id: string, changes: Partial<IUser>): Promise<IUser | null> => {
-  // Update updatedAt field
-  changes.updatedAt = new Date();
+// const update = async (id: string, changes: Partial<IUser>): Promise<IUser | null> => {
+//   // Update updatedAt field
+//   changes.updatedAt = new Date();
 
-  return await User.findByIdAndUpdate(id, changes, { new: true }).exec();
+//   return await User.findByIdAndUpdate(id, changes, { new: true }).exec();
+// };
+
+const update = async (id: string, changes: Partial<IUser>): Promise<IUser | null> => {
+  try {
+    // Update `updatedAt` field to the current date
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { ...changes, updatedAt: new Date() },
+      { new: true, runValidators: true } // `new: true` returns the updated document, `runValidators: true` validates the update
+    ).exec();
+
+    return updatedUser;
+  } catch (error) {
+    console.error(`Error updating user with ID ${id}:`, error);
+    throw new Error('Failed to update user');
+  }
 };
 
 const updateViaEmail = async (email: string, changes: Partial<IUser>): Promise<IUser | null> => {
