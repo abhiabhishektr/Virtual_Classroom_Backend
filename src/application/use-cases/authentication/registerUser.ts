@@ -22,7 +22,7 @@ const validateName = (name: string): boolean => {
   return name.length >= 3 && name.length <= 50;
 };
 
-export const registerUser = async ({ email, password, name, otp }: RegisterUserInput) => {
+export const registerUser = async ({ email, password, name, otp }: RegisterUserInput) => {    
   const hashedPassword = await authService.hashPassword(password);
 
   if (!validateEmail(email)) {
@@ -43,10 +43,11 @@ export const registerUser = async ({ email, password, name, otp }: RegisterUserI
   }
 
   const user = await userRepository.create({ email, password: hashedPassword, name });
-  const tokens = authService.generateTokens(user);
+  const tokens = await authService.generateTokens(user);
 
   return { tokens };
 };
+
 
 interface ForgotPasswordInput {
   email: string;
@@ -83,12 +84,40 @@ console.log(email, password, otp);
     throw new Error('Failed to update user try again later');
   }
 
-  const tokens = authService.generateTokens(updatedUser);
+  const tokens = await authService.generateTokens(updatedUser);
 
   return { tokens };
 };
 
 
+interface GoogleLoginInput {
+  email: string;
+  name: string;
+  googleId: string;
+  profilePicture: string;
+}
+
+export const googleLogin = async ({ email, name, googleId ,profilePicture}: GoogleLoginInput) => {
+  // Check if the user exists
+  let user = await userRepository.findByEmail(email);
+  
+  if (!user) {
+    // If user does not exist, create a new one with Google ID as password
+    const hashedPassword = await authService.hashPassword(googleId); // Use Google ID as password
+    user = await userRepository.create({
+      email,
+      password: hashedPassword,
+      name: name || 'Unknown',
+      profilePicture,
+     
+    });
+  }
+
+  // Generate tokens for the user
+  const tokens = await authService.generateTokens(user);
+
+  return tokens;
+};
 
 
 export const verifyOTP = async (email: string, otp: string): Promise<boolean> => {

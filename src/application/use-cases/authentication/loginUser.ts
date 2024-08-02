@@ -3,6 +3,7 @@
 import { userRepository } from '../../repositories/userRepository';
 import { authService } from '../../services/authService';
 import { IUser } from '../../../infrastructure/database/models/User';
+import { log } from 'console';
 
 
 interface LoginUserInput {
@@ -26,7 +27,7 @@ export const loginUser = async ({ email, password }: LoginUserInput) => {
     throw new Error('Invalid email or password');
   }
 
-  const tokens = authService.generateTokens(user);
+  const tokens = await authService.generateTokens(user);
   
   return { tokens };
 };
@@ -59,7 +60,6 @@ export const updateIsVerifiedUseCase = async (userId: string, changes: Partial<I
 
 export const loginAdmin = async ({ email, password }: LoginUserInput) => {
   const user = await userRepository.findByEmail(email);
-  console.log('user', user);
 
   if (!user) {
     throw new Error('User not found');
@@ -73,7 +73,8 @@ export const loginAdmin = async ({ email, password }: LoginUserInput) => {
     throw new Error('Invalid email or password');
   }
 
-  const tokens = authService.generateTokens(user);
+  const tokens = await authService.generateTokens(user);
+  
   return { user, tokens };
 };
 

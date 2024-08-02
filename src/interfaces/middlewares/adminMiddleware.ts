@@ -15,11 +15,15 @@ export const adminMiddleware = (req: Request, res: Response, next: NextFunction)
   }
   
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-    (req as any).user = decoded;
-    console.log("decoded");
-    
-    next();
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string; role: string };
+    (req as any).user = { id: decoded.id };
+
+    if (decoded.role === 'admin') {
+        console.log('Access granted. Admin.');
+        next();
+    } else {
+        res.status(403).json({ message: 'Access denied. You must be admin.' });
+    }
   } catch (err  : any) {
     console.log('token not valid');
     

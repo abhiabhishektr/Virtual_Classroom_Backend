@@ -12,7 +12,7 @@ export interface IUser extends Document {
   profilePicture?: string; // Optional field for profile picture URL
   createdAt: Date; // Date of user creation
   updatedAt: Date; // Date of last update
-  // Add other properties as needed
+  role: 'user' | 'teacher' | 'admin';
 }
 
 const userSchema = new Schema<IUser>({
@@ -25,6 +25,7 @@ const userSchema = new Schema<IUser>({
   profilePicture: { type: String }, // Optional field for profile picture URL
   createdAt: { type: Date, default: Date.now }, // Default to current date/time
   updatedAt: { type: Date, default: Date.now }, // Default to current date/time
+  role: { type: String, enum: ['user', 'teacher', 'admin'], default: 'user' },
   // Add other fields as needed
 });
 
