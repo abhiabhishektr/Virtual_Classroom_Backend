@@ -1,8 +1,9 @@
 // backend/src/interfaces/routes/authenticationRoutes.ts
 
 import { Router } from 'express';
-import { registerUser, loginUser, logoutUser, loginAdmin ,resendOTP, sendOTP ,forgotPassword,forgotPasswordOTP} from '../controllers/authenticationController'; //refreshToken,verifyOTP
-import { googleAuth, googleCallback, setupSession } from '../controllers/googleAuth'
+import { registerUser, loginUser, logoutUser, loginAdmin, resendOTP, sendOTP, forgotPassword, forgotPasswordOTP, refreshToken } from '../controllers/authenticationController'; //refreshToken,verifyOTP
+import { googleAuthCallback } from '../controllers/googleAuth'
+
 
 const router = Router();
 
@@ -13,15 +14,16 @@ router.post('/send-otp', sendOTP);
 router.post('/resend-otp', resendOTP);
 router.post('/forgot-passwordOTP', forgotPasswordOTP);
 router.post('/forgot-password', forgotPassword);
+router.post('/refresh-token', refreshToken);
 
 
-// router.post('/refresh-token', );
 // router.post('/reset-password', resetPassword);
 
 // router.post('/verify-otp', verifyOTP);
 
-router.get('/google', googleAuth);
-router.get("/google/callback", googleCallback, setupSession);
+// router.get('/google', googleAuth);
+router.post("/google/callback", googleAuthCallback);
+
 
 
 // --------admin----------
@@ -33,6 +35,8 @@ router.post('/adminlogin', loginAdmin);
 router.get('/test', (req, res) => {
   res.send('Hello, testing route!');
 });
+
+
 // ============= Testing route ================
 
 export default router;

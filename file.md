@@ -2,7 +2,7 @@
 ├── src
 │   ├── main
 │   │   ├── server.ts
-│   │   └── app.ts
+│   │   ├── app.ts
 │   │   └── redisClient.ts
 │   ├── infrastructure
 │   │   └── database
@@ -10,23 +10,37 @@
 │   │       └── models
 │   │           ├── User.ts
 │   │           ├── Teacher.ts
-│   │           └── Classroom.ts
+│   │           ├── Classroom.ts
+│   │           └── Course.ts         
 │   ├── interfaces
 │   │    ├── middlewares
 │   │    │   ├── errorHandler.ts
 │   │    │   └── authMiddleware.ts
 │   │    ├── routes
+│   │    │   ├── admin
+│   │    │   │   └── adminRoutes.ts
+│   │    │   ├── teacher
+│   │    │   │   └── teacherRoutes.ts
 │   │    │   ├── authenticationRoutes.ts
 │   │    │   ├── profileRoutes.ts
 │   │    │   ├── classroomRoutes.ts
-│   │    │   └── notificationRoutes.ts
+│   │    │   ├── teacherRoutes.ts
+│   │    │   ├── notificationRoutes.ts
+│   │    │   └── courseRoutes.ts       
 │   │    ├── controllers
+│   │    │   ├── admin
+│   │    │   │   └── adminControllers.ts
+│   │    │   ├── teacher
+│   │    │   │   └── teacherController.ts
 │   │    │   ├── authenticationController.ts
+│   │    │   ├── teacherController.ts
 │   │    │   ├── profileController.ts
 │   │    │   ├── classroomController.ts
 │   │    │   └── notificationController.ts
+│   │    │   └── courseController.ts   
 │   │    └── dtos
 │   │        └── UserDTO.ts
+│   │        └── CourseDTO.ts          
 │   └── application
 │       ├── use-cases
 │       │   ├── authentication
@@ -41,16 +55,20 @@
 │       │   └── classroom
 │       │       ├── startClassroom.ts
 │       │       └── joinClassroom.ts
+│       │   └── course
+│       │       ├── createCourse.ts    
+│       │       ├── updateCourse.ts    
+│       │       └── deleteCourse.ts    
 │       ├── services
 │       │   ├── notificationService.ts
 │       │   └── chatService.ts
 │       │   └── authService.ts
+│       │   └── courseService.ts       
 │       │── repositories
 │       │   ├── userRepository.ts
 │       │   ├── teacherRepository.ts
 │       │   └── classroomRepository.ts
+│       │   └── courseRepository.ts    
 ├── .env
 ├── package.json
 └── tsconfig.json
-
-    

@@ -11,7 +11,7 @@
     },
     "include": [
         "src/**/*.ts"
-, "src/interfaces/controllers/googleAuth.ts"    ],
+, "src/interfaces/controllers/googleAuth.ts", "src/infrastructure/database/models/TeacherRequest.ts"    ],
     "exclude": [
         "node_modules"
     ]

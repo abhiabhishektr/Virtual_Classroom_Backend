@@ -9,9 +9,12 @@ export const viewProfile = async (req: Request, res: Response) => {
 
   try {
     const profile = await viewProfileUseCase((req as any).user);
+    
     const profileDTO: ProfileDTO = {
       name: profile?.name ?? '',
       email: profile?.email ?? '',
+      role: profile?.role ?? '',
+      profilePicture: profile?.profilePicture ?? '',
       // phone: profile?.phone ?? '',
     };
     res.status(200).json(profileDTO);
@@ -32,7 +35,7 @@ export const editProfile = async (req: Request, res: Response) => {
     res.status(200).json(updatedProfile);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
-  }
+  } 
 };
 
 

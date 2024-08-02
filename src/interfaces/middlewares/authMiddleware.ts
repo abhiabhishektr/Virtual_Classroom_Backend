@@ -3,10 +3,11 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv';
+import { userRepository } from '../../application/repositories/userRepository';
 dotenv.config();
 
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = async  (req: Request, res: Response, next: NextFunction) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
   if (!token) {
@@ -14,10 +15,14 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   }
 
   try {
-    
-    console.log("decoded");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-    (req as any).user = decoded;
+  
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string; };
+    (req as any).user = { id: decoded.id };
+
+    const user = await userRepository.findById((req as any).user.id);
+    if (user?.blocked) {
+      return res.status(403).json({ message: 'User is blocked' });
+    }
     
     next();
   } catch (err  : any) {

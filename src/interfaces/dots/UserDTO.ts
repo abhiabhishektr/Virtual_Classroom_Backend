@@ -4,7 +4,9 @@ export interface ProfileDTO {
   name: string;
   // username: string;
   email: string;
+  role?: string;
   phone?: string;
+  profilePicture?: string;
 }
 
 export interface EditProfileDTO {

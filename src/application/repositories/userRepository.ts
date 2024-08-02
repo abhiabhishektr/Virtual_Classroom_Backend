@@ -79,6 +79,11 @@ const unblockUser = async (email: string): Promise<void> => {
   await User.findOneAndUpdate({ email }, { blocked: false }, { new: true }).exec();
 };
 
+// In userRepository.ts
+export const updateUserRole = async (userId: string, role: 'user' | 'teacher') => {
+  return await User.findByIdAndUpdate(userId, { role }, { new: true });
+};
+
 
 
 export const userRepository = {
@@ -89,6 +94,7 @@ export const userRepository = {
   getAllUsers,
   blockUser,
   unblockUser,
-  updateViaEmail
+  updateViaEmail,
+  updateUserRole
   // Add other repository methods as needed
 };

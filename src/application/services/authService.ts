@@ -4,11 +4,18 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { IUser } from '../../infrastructure/database/models/User';
 import { redisClient } from '../../main/redisClient';
+// import { promisify } from 'util';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
-const ACCESS_TOKEN_EXPIRY = '15h'; // 15 minutes
+const ACCESS_TOKEN_EXPIRY = '15h'; // 15 minutes 
 const REFRESH_TOKEN_EXPIRY = '7d'; // 7 days
+// // // testing
+// const ACCESS_TOKEN_EXPIRY = '10s'; // 30 seconds
+// const REFRESH_TOKEN_EXPIRY = '1m';  // 2 minutes
+
+
+// const setAsync = promisify(redisClient.set).bind(redisClient);
 
 export const authService = {
   hashPassword: async (password: string): Promise<string> => {
@@ -20,19 +27,24 @@ export const authService = {
     return await bcrypt.compare(password, hashedPassword);
 
   },
+  generateTokens: async (user: IUser): Promise<{ accessToken: string; refreshToken: string }> => {
+    const accessToken = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRY });
+    const refreshToken = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRY });
 
-  generateTokens: (user: IUser): { accessToken: string; refreshToken: string } => {
-    const accessToken = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRY });
-    const refreshToken = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRY });
+    await authService.storeRefreshToken(user.id, refreshToken); // Store refresh token
+
     return { accessToken, refreshToken };
   },
+
 
   verifyToken: (token: string): any => {
     return jwt.verify(token, JWT_SECRET);
   },
 
   storeRefreshToken: async (userId: string, refreshToken: string): Promise<void> => {
-    await redisClient.set(userId, refreshToken, 'EX', 7 * 24 * 60 * 60); // Store for 7 days
+    await redisClient.set(userId, refreshToken, { EX: 7 * 24 * 60 * 60 });
+    // await redisClient.set(userId, refreshToken,{ EX: 1 * 60 }); // testing
+    // await setAsync(userId, refreshToken, 'EX', 7 * 24 * 60 * 60); // Store for 7 days
   },
 
   refreshToken: async (refreshToken: string): Promise<{ accessToken: string; refreshToken: string } | null> => {
@@ -53,6 +65,7 @@ export const authService = {
       return null;
     }
   },
+
   removeRefreshToken: async (userId: string): Promise<void> => {
     await redisClient.del(userId);
   }
