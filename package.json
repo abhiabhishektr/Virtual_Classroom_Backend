@@ -25,6 +25,7 @@
     "express": "^4.17.1",
     "google-auth-library": "^9.13.0",
     "googleapis": "^140.0.1",
+    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.8.0",
     "mongoose": "^5.11.18",
@@ -33,6 +34,7 @@
     "nodemailer": "^6.9.14",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "razorpay": "^2.9.4",
     "redis": "^4.6.15"
   },
   "devDependencies": {

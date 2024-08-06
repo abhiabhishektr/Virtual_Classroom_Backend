@@ -11,6 +11,10 @@ export interface ICourse extends Document {
     imageUrl: string;
 }
 
+export interface ExtendedCourse extends ICourse {
+    isPurchased: boolean;
+} // for sending to the course detail page
+
 const CourseSchema: Schema = new Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },

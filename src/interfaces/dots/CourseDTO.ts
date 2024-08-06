@@ -16,3 +16,21 @@ export interface CourseTeacherDTO {
   imageUrl: string;
   fees: number;
 }
+
+export interface courseListingDTO {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  fees: number;
+}
+
+export const mapToCourseListingDTO = (course: any): courseListingDTO => {
+  return {
+    id: course._id.toString(),
+    title: course.title,
+    description: course.description,
+    imageUrl: course.imageUrl,
+    fees: course.fees
+  };
+};

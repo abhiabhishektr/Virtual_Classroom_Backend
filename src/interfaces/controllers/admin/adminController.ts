@@ -14,8 +14,6 @@ export const getUsers = async (req: Request, res: Response) => {
 export const blockUser = async (req: Request, res: Response) => {
 
   const userId = req.params.id;
-  console.log('userId', userId);
-  
   try {
     await userRepository.blockUser(userId);
     res.status(200).json({ message: 'User blocked successfully' });

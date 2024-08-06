@@ -1,7 +1,7 @@
 // src/application/services/courseService.ts
 import { createCourse, updateCourse, deleteCourse, getCourseById, getAllCourses, getCoursesByTeacher } from '../repositories/courseRepository';
 import { ICourse } from '../../infrastructure/database/models/Course';
-import { CourseDTO, CourseTeacherDTO } from '../../interfaces/dots/CourseDTO';
+import { CourseDTO, courseListingDTO, CourseTeacherDTO, mapToCourseListingDTO } from '../../interfaces/dots/CourseDTO';
 
 export const createNewCourse = async (courseData: ICourse): Promise<ICourse> => {
   console.log("courseData",courseData);
@@ -21,9 +21,13 @@ export const getCourseDetails = async (id: string): Promise<ICourse | null> => {
   return getCourseById(id);
 };
 
-export const getAllCourseDetails = async (): Promise<ICourse[]> => {
-  return getAllCourses();
+
+
+export const getAllCourseDetails = async (): Promise<courseListingDTO[]> => {
+  const response = await getAllCourses(); // Assume this returns the full course data
+  return response.map(mapToCourseListingDTO);
 };
+
 
 export const getAllCourseDetailsbyTeacher = async (instructorId: string): Promise<CourseTeacherDTO[]> => {
   const courses = await getCoursesByTeacher(instructorId);

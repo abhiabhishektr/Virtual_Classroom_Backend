@@ -23,6 +23,10 @@ export const loginUser = async ({ email, password }: LoginUserInput) => {
     throw new Error('User not found');
   }
 
+  if (user.blocked) {
+    throw new Error('User is blocked');
+  }
+
   if (! await authService.verifyPassword(password, user.password)) {
     throw new Error('Invalid email or password');
   }
