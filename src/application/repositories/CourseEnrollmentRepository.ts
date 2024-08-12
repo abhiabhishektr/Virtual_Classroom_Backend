@@ -7,7 +7,7 @@ import { User } from '../../infrastructure/database/models/User';
 export interface IUserCourseRepository {
     getUserPurchasedCourses(userId: string): Promise<ICourse[]>;
     enrollCourse(userId: string, courseId: string, paymentId?: string, amount?: number): Promise<IEnrollment>;
-    getEnrollment(userId: string, paymentId?: string): Promise<IEnrollment | null>;
+    getEnrollment(userId: string, paymentId?: string, courseId?: string): Promise<IEnrollment | null>;
     getCourseById(courseId: string): Promise<ICourse | null>; // Added to fetch course details
     getCourseAmountById(courseId: string): Promise<number | null>;
     isCoursePurchased(userId: string, courseId: string): Promise<boolean>;
@@ -43,7 +43,7 @@ export const createUserCourseRepository = (): IUserCourseRepository => ({
         });
         return await newEnrollment.save();
     },
-    getEnrollment: async (userId: string, paymentId?: string): Promise<IEnrollment | null> => {
+    getEnrollment: async (userId: string, paymentId?: string, courseId?: string): Promise<IEnrollment | null> => {
         const userIdObj =  mongoose.Types.ObjectId(userId);
         console.log(`userIdObj: ${userIdObj} paymentId: ${paymentId}`);
         
@@ -68,6 +68,9 @@ export const createUserCourseRepository = (): IUserCourseRepository => ({
             { $set: { 'courses.$.status': 'paid' } },
             { new: true }
         );
+        if (courseId) {
+            await CourseModel.findByIdAndUpdate(courseId, { $inc: { enrollmentCount: 1 } });
+        }
         console.log('Updated enrollment:', enrollment);
     
         return enrollment;

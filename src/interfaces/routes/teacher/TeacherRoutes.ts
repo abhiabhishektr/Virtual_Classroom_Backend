@@ -14,7 +14,20 @@ import {
   getCourses,
   getCourse,
   getCoursesbyTeacher,
+  updateContents,
 } from '../../controllers/teacher/courseController';
+
+
+
+import {
+    getCourseModules,
+    addModule,
+    getModuleById,
+    updateModule,
+    deleteModule,
+    deleteContent
+} from '../../controllers/teacher/CourseContentController';
+
 
 const router = Router();
 
@@ -57,11 +70,29 @@ router.post('/courses', uploadMiddleware, createCourse);
 // Route to update a course
 router.put('/courses/:id', uploadMiddleware, updateCourse);
 
+router.put('/contents/:id',  updateContents);
+
 router.get('/getCoursesbyTeacher', getCoursesbyTeacher);
 
 router.get('/getCourseByIdTeacher/:id', getCourse);
 
 // Route to delete a course
-router.delete('/courses/:id', deleteCourse);
+router.delete('/deleteCourse/:id', deleteCourse);
+
+
+
+
+router.post('/modules', addModule);
+router.get('/modules/course/:courseId', getCourseModules);
+router.get('/modules/:moduleId', getModuleById);// not using now
+router.put('/modules/:moduleId', updateModule);
+router.delete('/modules/:moduleId', deleteModule);
+router.delete('/modules/:moduleId/contents/:contentId', deleteContent);
+
+
+
+
+
+
 
 export default router;

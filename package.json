@@ -6,8 +6,9 @@
   "scripts": {
     "start": "ts-node src/main/server.ts",
     "build": "tsc",
-    "dev": "nodemon --exec ts-node src/main/server.ts",
+    "dev": "nodemon --watch src --ignore node_modules --delay 1000ms --exec ts-node src/main/server.ts",
     "prestart": "yarn build"
+
   },
   "dependencies": {
     "@types/mongodb": "^4.0.7",
@@ -48,3 +49,4 @@
     "typescript": "^5.5.3"
   }
 }
+

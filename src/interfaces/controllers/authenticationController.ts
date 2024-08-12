@@ -26,6 +26,14 @@ export const registerUser = async (req: Request, res: Response) => {
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const result = await loginUserUseCase(req.body);
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    // Corrected the catch block to handle the error properly
+    res.status(400).json({ message: error.message });
+  }
+};
+
     // // HTTPS
     // res.cookie('refreshToken', result.tokens.refreshToken, {
     //   httpOnly: true,
@@ -41,15 +49,6 @@ export const loginUser = async (req: Request, res: Response) => {
     //   sameSite: 'lax',
     //   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     // });
-
-    // console.log('result', result);
-    res.status(200).json(result);
-  } catch (error: any) {
-    // Corrected the catch block to handle the error properly
-    res.status(400).json({ message: error.message });
-  }
-};
-
 
 // -----------------admin login---------------
 export const loginAdmin = async (req: Request, res: Response) => {

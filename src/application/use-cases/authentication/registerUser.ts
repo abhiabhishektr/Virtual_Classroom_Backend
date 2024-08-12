@@ -45,7 +45,15 @@ export const registerUser = async ({ email, password, name, otp }: RegisterUserI
   const user = await userRepository.create({ email, password: hashedPassword, name });
   const tokens = await authService.generateTokens(user);
 
-  return { tokens };
+  const userData = {
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    profilePicture: user.profilePicture || '', // Provide an empty string if profilePicture is not set
+  };
+
+  return { tokens, userData };
+  // return { tokens };
 };
 
 

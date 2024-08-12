@@ -128,7 +128,7 @@ export const getCourses = async (_req: Request, res: Response): Promise<void> =>
     try {
         
         const courses = await courseService.getAllCourseDetails();
-        console.log("courses", courses);
+        // console.log("courses", courses);
 
         res.status(200).json({data:courses});
     } catch (error: any) {
@@ -142,8 +142,24 @@ export const getCoursesbyTeacher = async (_req: Request, res: Response): Promise
 
         const courses = await courseService.getAllCourseDetailsbyTeacher((_req.user as User)?.id ?? null);
         // console.log("courses",courses);
-        res.status(200).json(courses);
+        res.status(200).json({data:courses});
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+
+
+export const updateContents = async (_req: Request, res: Response): Promise<void> => {
+    try {
+
+      
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+
+

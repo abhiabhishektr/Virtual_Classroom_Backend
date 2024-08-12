@@ -53,12 +53,11 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
         return;
       }
 
-      // console.log('Order created successfully:', order);
       try {
         await courseRepository.enrollCourse(userId, courseId, order.id, amount);
 
 
-        res.status(200).json({ data: order });
+        res.status(200).json({ data: order, courseId  });
       } catch (dbError) {
         console.error('Database error:', dbError);
         res.status(500).json({ message: 'Error saving order to database!' });
@@ -69,7 +68,7 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
     res.status(500).json({ message: 'Internal Server Error!' });
   }
 };
-
+ 
 
 
 
@@ -77,7 +76,7 @@ export const createOrder = async (req: Request, res: Response): Promise<void> =>
 
 export const verifyOrder = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { paymentId, orderId, signature } = req.body;
+    const { paymentId, orderId, signature,courseId } = req.body;
     // console.log(req.body);
 
     const userId = (req.user as User)?.id ?? null;
@@ -96,7 +95,8 @@ export const verifyOrder = async (req: Request, res: Response): Promise<void> =>
     if (generatedSignature === signature) {
       // Payment verification successful
 
-      await courseRepository.getEnrollment(userId, orderId);
+      await courseRepository.getEnrollment(userId, orderId,courseId);
+      
       //  console.log('re',re);
 
       res.status(200).json({ message: 'Payment verified successfully!', success: true });

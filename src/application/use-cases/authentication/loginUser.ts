@@ -33,7 +33,16 @@ export const loginUser = async ({ email, password }: LoginUserInput) => {
 
   const tokens = await authService.generateTokens(user);
   
-  return { tokens };
+  const userData = {
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    profilePicture: user.profilePicture || '', // Provide an empty string if profilePicture is not set
+  };
+
+  return { tokens, userData };
+
+  // return { tokens };
 };
 
 
