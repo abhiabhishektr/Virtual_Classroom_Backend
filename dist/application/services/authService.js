@@ -34,8 +34,8 @@ exports.authService = {
         return yield bcryptjs_1.default.compare(password, hashedPassword);
     }),
     generateTokens: (user) => __awaiter(void 0, void 0, void 0, function* () {
-        const accessToken = jsonwebtoken_1.default.sign({ id: user.id }, JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRY });
-        const refreshToken = jsonwebtoken_1.default.sign({ id: user.id }, JWT_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRY });
+        const accessToken = jsonwebtoken_1.default.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRY });
+        const refreshToken = jsonwebtoken_1.default.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRY });
         yield exports.authService.storeRefreshToken(user.id, refreshToken); // Store refresh token
         return { accessToken, refreshToken };
     }),

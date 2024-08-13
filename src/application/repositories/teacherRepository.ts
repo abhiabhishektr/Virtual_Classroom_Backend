@@ -1,3 +1,4 @@
+// src/application/repositories/teacherRepository.ts
 import TeacherRequest from '../../infrastructure/database/models/TeacherRequest';
 import { ITeacherRequest } from '../../infrastructure/database/models/TeacherRequest';
 

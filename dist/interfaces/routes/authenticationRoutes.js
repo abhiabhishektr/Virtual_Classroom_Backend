@@ -15,8 +15,8 @@ router.post('/forgot-password', authenticationController_1.forgotPassword);
 router.post('/refresh-token', authenticationController_1.refreshToken);
 // router.post('/reset-password', resetPassword);
 // router.post('/verify-otp', verifyOTP);
-router.get('/google', googleAuth_1.googleAuth);
-router.get("/google/callback", googleAuth_1.googleCallback, googleAuth_1.setupSession);
+// router.get('/google', googleAuth);
+router.post("/google/callback", googleAuth_1.googleAuthCallback);
 // --------admin----------
 router.post('/adminlogin', authenticationController_1.loginAdmin);
 // --------admin----------

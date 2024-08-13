@@ -12,6 +12,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.unblockUser = exports.blockUser = exports.getUsers = void 0;
 const User_1 = require("../../../infrastructure/database/models/User"); // Adjust path based on your project structure
+// import { adminUsers } from '../../../types/user';
 // Example function to fetch all users
 const getUsers = () => __awaiter(void 0, void 0, void 0, function* () {
     try {

@@ -4,7 +4,7 @@ import { createTeacherRequest, teacherRequestStatus } from '../controllers/teach
 import { getCourses } from '../controllers/teacher/courseController';
 import {
     getUserPurchasedCourses,
-    checkCoursePurchased,
+    checkCoursePurchased, 
     getCourseDetails, // Import the new controller method
     CoursePurchaseHistory
 } from '../controllers/user/userCourseController';

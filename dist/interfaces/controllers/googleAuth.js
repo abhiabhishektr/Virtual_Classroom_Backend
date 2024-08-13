@@ -1,5 +1,5 @@
 "use strict";
-// src/interfaces/controllers/googleAuth.ts
+// src/controllers/googleAuth.ts
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -9,68 +9,49 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setupSession = exports.googleCallback = exports.googleAuth = void 0;
-const passport_1 = __importDefault(require("passport"));
-const passport_google_oauth20_1 = require("passport-google-oauth20");
-const loginUser_1 = require("../../application/use-cases/authentication/loginUser");
-passport_1.default.use(new passport_google_oauth20_1.Strategy({
-    clientID: process.env.clientID,
-    clientSecret: process.env.clientSecret,
-    callbackURL: "localhost:5000/api/auth/google/callback",
-}, (accessToken, refreshToken, profile, done) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+exports.googleAuthCallback = void 0;
+const google_auth_library_1 = require("google-auth-library");
+const googleapis_1 = require("googleapis");
+const registerUser_1 = require("../../application/use-cases/authentication/registerUser");
+const oauth2Client = new google_auth_library_1.OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, 'http://localhost:5173');
+const googleAuthCallback = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d, _e, _f, _g, _h;
+    const { code } = req.body; // Authorization code should be in query parameters
+    if (!code || typeof code !== 'string') {
+        return res.status(400).json({ error: 'Authorization code is missing' });
+    }
     try {
-        // Extract necessary information from the Google API response
-        const { id: googleId, displayName: name } = profile;
-        const email = (_a = profile._json.email) !== null && _a !== void 0 ? _a : '';
-        // Call your login function
-        const { user, tokens } = yield (0, loginUser_1.googleLoginUser)({ email, profile });
-        // Return the user to be serialized and stored in the session
-        return done(null, user);
+        // Exchange the authorization code for tokens
+        const { tokens } = yield oauth2Client.getToken(code);
+        oauth2Client.setCredentials(tokens);
+        // Get user info from Google People API
+        const people = googleapis_1.google.people({ version: 'v1', auth: oauth2Client });
+        const response = yield people.people.get({
+            resourceName: 'people/me',
+            personFields: 'names,emailAddresses,photos',
+        });
+        const userInfo = response.data;
+        // Extract user details
+        const email = ((_b = (_a = userInfo.emailAddresses) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.value) || '';
+        const name = ((_d = (_c = userInfo.names) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.displayName) || 'No name';
+        const googleId = (_f = (_e = userInfo.resourceName) === null || _e === void 0 ? void 0 : _e.split('/')[1]) !== null && _f !== void 0 ? _f : ''; // Extract googleId from resourceName
+        console.log("google id", googleId);
+        const profilePicture = ((_h = (_g = userInfo.photos) === null || _g === void 0 ? void 0 : _g[0]) === null || _h === void 0 ? void 0 : _h.url) || 'No profile picture';
+        const googleTokens = yield (0, registerUser_1.googleLogin)({ email, name, googleId, profilePicture });
+        res.json({
+            success: true,
+            token: googleTokens,
+            user: {
+                name,
+                email,
+                profilePicture,
+            }
+        });
     }
     catch (error) {
-        console.error("Error during Google authentication:", error);
-        return done(error, undefined);
+        console.error('Authentication error:', error);
+        res.status(500).json({ error: 'Authentication failed' });
     }
-})));
-passport_1.default.serializeUser((user, done) => {
-    done(null, "user.id");
 });
-passport_1.default.deserializeUser((id, done) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // const user = await User.findById(id);
-        done(null, { "user": "user" });
-    }
-    catch (error) {
-        done(error, null);
-    }
-}));
-exports.googleAuth = passport_1.default.authenticate("google", { scope: ["profile", "email"] });
-exports.googleCallback = passport_1.default.authenticate("google", {
-    failureRedirect: "http://localhost:5173/auth",
-    // Do not provide successRedirect here
-});
-// Handle the session setup after successful authentication
-const setupSession = (req, res, next) => {
-    // Check if the user is authenticated
-    // if (req.isAuthenticated()) {
-    // }
-    // // Redirect to the appropriate route after session setup
-    // res.redirect("/");
-};
-exports.setupSession = setupSession;
-// let user = await User.findOne({ email });
-// if (!user) {
-//     // If the user doesn't exist, create a new user with the extracted information
-//     user = await User.create({
-//         googleId,
-//         email,
-//         name,
-//         otp: profile._json.email_verified,
-//         googleImage: profile._json.picture,
-//     });
-// }
+exports.googleAuthCallback = googleAuthCallback;

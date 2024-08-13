@@ -33,21 +33,12 @@ exports.registerUser = registerUser;
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield (0, loginUser_1.loginUser)(req.body);
-        // // HTTPS
         // res.cookie('refreshToken', result.tokens.refreshToken, {
         //   httpOnly: true,
-        //   secure: process.env.NODE_ENV === 'production', 
+        //   secure: true, 
         //   sameSite: 'strict',
         //   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         // });
-        // // HTTP
-        // res.cookie('refreshToken', result.tokens.refreshToken, {
-        //   httpOnly: true,
-        //   secure: false, 
-        //   sameSite: 'lax',
-        //   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-        // });
-        // console.log('result', result);
         res.status(200).json(result);
     }
     catch (error) {
@@ -56,6 +47,14 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.loginUser = loginUser;
+// // HTTPS
+// res.cookie('refreshToken', result.tokens.refreshToken, {
+//   httpOnly: true,
+//   secure: process.env.NODE_ENV === 'production', 
+//   sameSite: 'strict',
+//   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+// });
+// // HTTP
 // -----------------admin login---------------
 const loginAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -169,17 +168,3 @@ const refreshToken = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     res.json(newTokens);
 });
 exports.refreshToken = refreshToken;
-// export const verifyOTP = async (req: Request, res: Response) => {
-//   try {
-//     const result = await verifyOTPUseCase(req.body.email, req.body.otp);
-//     if (result) {
-//       // amke isverifed true here
-//       let user = await updateIsVerified(req.body.email, { isVerified: true });
-//       res.status(200).json({ message: 'OTP verified successfully', user });
-//     } else {
-//       res.status(400).json({ message: 'Invalid OTP' });
-//     }
-//   } catch (error: any) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };

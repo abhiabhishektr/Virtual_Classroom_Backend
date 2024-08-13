@@ -40,9 +40,14 @@ const adminMiddleware = (req, res, next) => {
     }
     try {
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        console.log("decoded");
-        next();
+        req.user = { id: decoded.id };
+        if (decoded.role === 'admin') {
+            console.log('Access granted. Admin.');
+            next();
+        }
+        else {
+            res.status(403).json({ message: 'Access denied. You must be admin.' });
+        }
     }
     catch (err) {
         console.log('token not valid');

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userRepository = void 0;
+exports.userRepository = exports.updateUserRole = void 0;
 const User_1 = require("../../infrastructure/database/models/User");
 const findByEmail = (email) => __awaiter(void 0, void 0, void 0, function* () {
     return yield User_1.User.findOne({ email }).exec();
@@ -67,6 +67,11 @@ const blockUser = (email) => __awaiter(void 0, void 0, void 0, function* () {
 const unblockUser = (email) => __awaiter(void 0, void 0, void 0, function* () {
     yield User_1.User.findOneAndUpdate({ email }, { blocked: false }, { new: true }).exec();
 });
+// In userRepository.ts
+const updateUserRole = (userId, role) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield User_1.User.findByIdAndUpdate(userId, { role }, { new: true });
+});
+exports.updateUserRole = updateUserRole;
 exports.userRepository = {
     findByEmail,
     create,
@@ -75,6 +80,7 @@ exports.userRepository = {
     getAllUsers,
     blockUser,
     unblockUser,
-    updateViaEmail
+    updateViaEmail,
+    updateUserRole: exports.updateUserRole
     // Add other repository methods as needed
 };

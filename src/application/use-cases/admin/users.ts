@@ -1,12 +1,13 @@
 // src/application/use-cases/admin/users.ts
 
-import { User } from '../../../infrastructure/database/models/User'; // Adjust path based on your project structure
+import { IUser, User } from '../../../infrastructure/database/models/User'; // Adjust path based on your project structure
+// import { adminUsers } from '../../../types/user';
 
 // Example function to fetch all users
-export const getUsers = async (): Promise<User[]> => {
+export const getUsers = async (): Promise<IUser[]> => {
   try {
     // Replace with your actual logic to fetch users from the database or any other source
-    const users: User[] = await User.find(); // Assuming Mongoose or any other ORM used
+    const users: IUser[] = await User.find(); // Assuming Mongoose or any other ORM used
     return users;
   } catch (error) {
     throw new Error('Failed to fetch users'); // Handle errors appropriately

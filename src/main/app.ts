@@ -18,6 +18,9 @@ import { User } from '../types/user';
 import { authAndTeacherMiddleware } from '../interfaces/middlewares/teacherAuthMiddleware';
 import { mockAuthMiddleware } from '../interfaces/middlewares/mockAuthMiddleware';
 import passport from 'passport';
+const cookieParser = require('cookie-parser');
+
+
 
 declare global {
   namespace Express {
@@ -44,6 +47,7 @@ export class App {
       methods: 'GET,POST,PUT,DELETE',
       credentials: true
     }));
+    this.app.use(cookieParser());
     this.app.use(passport.initialize());
     this.app.use(morgan('dev')); //  dev-log format  
     this.app.use(express.json());

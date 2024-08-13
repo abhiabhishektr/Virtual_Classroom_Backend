@@ -27,6 +27,7 @@ import {
     deleteModule,
     deleteContent
 } from '../../controllers/teacher/CourseContentController';
+import checkCourseOwnership from '../../middlewares/courseOwnership';
 
 
 const router = Router();
@@ -82,12 +83,14 @@ router.delete('/deleteCourse/:id', deleteCourse);
 
 
 
-router.post('/modules', addModule);
+router.post('/modules',checkCourseOwnership, addModule);
 router.get('/modules/course/:courseId', getCourseModules);
 router.get('/modules/:moduleId', getModuleById);// not using now
-router.put('/modules/:moduleId', updateModule);
-router.delete('/modules/:moduleId', deleteModule);
-router.delete('/modules/:moduleId/contents/:contentId', deleteContent);
+
+
+router.put('/modules/:moduleId',checkCourseOwnership, updateModule);
+router.delete('/modules/:chapterId',checkCourseOwnership, deleteModule);
+router.delete('/modules',checkCourseOwnership, deleteContent);
 
 
 

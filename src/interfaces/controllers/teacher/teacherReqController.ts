@@ -1,3 +1,4 @@
+// src/interfaces/controllers/teacher/teacherReqController.ts
 import { Request, Response } from 'express';
 import * as teacherRepository from '../../../application/repositories/teacherRepository';
 import { User } from '../../../types/user';

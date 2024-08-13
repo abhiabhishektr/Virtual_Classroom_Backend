@@ -20,6 +20,8 @@ const adminMiddleware_1 = require("../interfaces/middlewares/adminMiddleware");
 const adminUserRoutes_1 = __importDefault(require("../interfaces/routes/admin/adminUserRoutes"));
 const teacherAuthMiddleware_1 = require("../interfaces/middlewares/teacherAuthMiddleware");
 const mockAuthMiddleware_1 = require("../interfaces/middlewares/mockAuthMiddleware");
+const passport_1 = __importDefault(require("passport"));
+const cookieParser = require('cookie-parser');
 class App {
     constructor() {
         this.app = (0, express_1.default)();
@@ -28,7 +30,14 @@ class App {
         this.setupErrorHandling();
     }
     configureMiddleware() {
-        this.app.use((0, cors_1.default)());
+        // this.app.use(cors());
+        this.app.use((0, cors_1.default)({
+            origin: 'http://localhost:5173', // Add your frontend URL here
+            methods: 'GET,POST,PUT,DELETE',
+            credentials: true
+        }));
+        this.app.use(cookieParser());
+        this.app.use(passport_1.default.initialize());
         this.app.use((0, morgan_1.default)('dev')); //  dev-log format  
         this.app.use(express_1.default.json());
     }

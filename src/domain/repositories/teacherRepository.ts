@@ -1,12 +1,12 @@
-// src/domain/repositories/teacherRepository.ts
+// // src/domain/repositories/teacherRepository.ts
 
-import { Teacher } from '../entities/teacher';
+// import { Teacher } from '../entities/teacher';
 
 
-interface TeacherRepository {
-  findByEmail(email: string): Promise<Teacher | null>;
-}
+// interface TeacherRepository {
+//   findByEmail(email: string): Promise<Teacher | null>;
+// }
 
-export default TeacherRepository;
+// export default TeacherRepository;
 
 

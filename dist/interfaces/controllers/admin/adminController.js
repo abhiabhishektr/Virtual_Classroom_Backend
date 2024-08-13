@@ -23,7 +23,6 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getUsers = getUsers;
 const blockUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.params.id;
-    console.log('userId', userId);
     try {
         yield userRepository_1.userRepository.blockUser(userId);
         res.status(200).json({ message: 'User blocked successfully' });

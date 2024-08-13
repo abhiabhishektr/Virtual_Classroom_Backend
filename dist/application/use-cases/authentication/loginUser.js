@@ -18,11 +18,21 @@ const loginUser = (_a) => __awaiter(void 0, [_a], void 0, function* ({ email, pa
     if (!user) {
         throw new Error('User not found');
     }
+    if (user.blocked) {
+        throw new Error('User is blocked');
+    }
     if (!(yield authService_1.authService.verifyPassword(password, user.password))) {
         throw new Error('Invalid email or password');
     }
     const tokens = yield authService_1.authService.generateTokens(user);
-    return { tokens };
+    const userData = {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        profilePicture: user.profilePicture || '', // Provide an empty string if profilePicture is not set
+    };
+    return { tokens, userData };
+    // return { tokens };
 });
 exports.loginUser = loginUser;
 const userExists = (email) => __awaiter(void 0, void 0, void 0, function* () {

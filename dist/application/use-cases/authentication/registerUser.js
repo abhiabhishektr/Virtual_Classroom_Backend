@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyOTP = exports.forgotPassword = exports.registerUser = void 0;
+exports.verifyOTP = exports.googleLogin = exports.forgotPassword = exports.registerUser = void 0;
 const userRepository_1 = require("../../repositories/userRepository");
 const authService_1 = require("../../services/authService");
 const otpService_1 = require("./otpService");
@@ -39,8 +39,15 @@ const registerUser = (_a) => __awaiter(void 0, [_a], void 0, function* ({ email,
         throw new Error('Invalid OTP');
     }
     const user = yield userRepository_1.userRepository.create({ email, password: hashedPassword, name });
-    const tokens = authService_1.authService.generateTokens(user);
-    return { tokens };
+    const tokens = yield authService_1.authService.generateTokens(user);
+    const userData = {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        profilePicture: user.profilePicture || '', // Provide an empty string if profilePicture is not set
+    };
+    return { tokens, userData };
+    // return { tokens };
 });
 exports.registerUser = registerUser;
 const forgotPassword = (_a) => __awaiter(void 0, [_a], void 0, function* ({ email, password, otp }) {
@@ -69,6 +76,24 @@ const forgotPassword = (_a) => __awaiter(void 0, [_a], void 0, function* ({ emai
     return { tokens };
 });
 exports.forgotPassword = forgotPassword;
+const googleLogin = (_a) => __awaiter(void 0, [_a], void 0, function* ({ email, name, googleId, profilePicture }) {
+    // Check if the user exists
+    let user = yield userRepository_1.userRepository.findByEmail(email);
+    if (!user) {
+        // If user does not exist, create a new one with Google ID as password
+        const hashedPassword = yield authService_1.authService.hashPassword(googleId); // Use Google ID as password
+        user = yield userRepository_1.userRepository.create({
+            email,
+            password: hashedPassword,
+            name: name || 'Unknown',
+            profilePicture,
+        });
+    }
+    // Generate tokens for the user
+    const tokens = yield authService_1.authService.generateTokens(user);
+    return tokens;
+});
+exports.googleLogin = googleLogin;
 const verifyOTP = (email, otp) => __awaiter(void 0, void 0, void 0, function* () {
     return otpService_1.otpService.verifyOTP(email, otp);
 });

@@ -16,13 +16,16 @@ export const getCourseModules = async (req: Request, res: Response): Promise<voi
             return;
         }
 
-        const moduleData  = await courseContentUseCase.getCourseModules(req.params.courseId);
+        const moduleData = await courseContentUseCase.getCourseModules(req.params.courseId);
+        console.log(moduleData);
+
         const responseData = {
-            modules: moduleData.map(module => ({
-                ...module,
-                title: course.title // Add the course title to each module
-            }))
+            title: course.title,
+            courseId: course._id, // Assuming 'title' is the property containing the course title
+            modules: moduleData[0]?.modules,
+            moduleId: moduleData[0]?._id
         };
+        // res.status(200).json({data:moduleData[0]?.modules});
         res.status(200).json({ data: responseData });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
@@ -90,8 +93,8 @@ export const updateModule = async (req: Request, res: Response): Promise<void> =
 // Handler to delete a module by ID
 export const deleteModule = async (req: Request, res: Response): Promise<void> => {
     try {
-        const moduleId = req.params.moduleId;
-        const courseId = req.body.courseId; // Ensure you pass courseId to the handler
+        const chapterId = req.params.chapterId;
+        const { courseId, moduleId } = req.body.courseId; // Ensure you pass courseId to the handler
 
         // Check if the module exists
         const module = await courseContentUseCase.getModuleById(moduleId);
@@ -116,13 +119,15 @@ export const deleteModule = async (req: Request, res: Response): Promise<void> =
 
 
 export const deleteContent = async (req: Request, res: Response): Promise<void> => {
+
     try {
-        const { moduleId, contentId } = req.params;
-        const courseId = req.body.courseId; // Ensure you pass courseId to the handler
+        const { chapterId, moduleId, contentId, courseId } = req.body // Ensure you pass courseId to the handler
+        console.log(`moduelId: ${moduleId}  contentId: ${contentId} courseId: ${courseId} chapterId: ${chapterId}`);
 
         // Check if the module exists
         const module = await courseContentUseCase.getModuleById(moduleId);
         if (!module) {
+            console.log(33);
             res.status(404).json({ message: 'Module not found' });
             return;
         }

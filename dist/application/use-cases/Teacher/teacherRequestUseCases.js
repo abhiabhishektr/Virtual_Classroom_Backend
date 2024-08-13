@@ -32,13 +32,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateTeacherRequestStatus = exports.getTeacherRequestById = exports.getAllTeacherRequests = exports.createTeacherRequest = void 0;
+exports.updateTeacherRequestStatus = exports.getTeacherRequestById = exports.getAllTeacherRequests = void 0;
 const teacherRepository = __importStar(require("../../repositories/teacherRepository"));
 // Create a new teacher request
-const createTeacherRequest = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield teacherRepository.createTeacherRequest(Object.assign(Object.assign({}, data), { status: 'pending' }));
-});
-exports.createTeacherRequest = createTeacherRequest;
+// export const createTeacherRequest = async (data: {
+//     userId: string;
+//     highestQualification: string;
+//     yearsOfTeachingExperience: number;
+//     subjects: string[];
+//     bio: string;
+// }) => {
+//     return await teacherRepository.createTeacherRequest({
+//         ...data,
+//         status: 'pending',
+//     });
+// };
 // Get all teacher requests
 const getAllTeacherRequests = () => __awaiter(void 0, void 0, void 0, function* () {
     return yield teacherRepository.getAllTeacherRequests();

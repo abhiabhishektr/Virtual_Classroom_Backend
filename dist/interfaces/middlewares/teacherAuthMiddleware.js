@@ -22,15 +22,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -39,8 +30,7 @@ exports.authAndTeacherMiddleware = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
-const User_1 = require("../../infrastructure/database/models/User"); // Adjust the path as needed
-const authAndTeacherMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const authAndTeacherMiddleware = (req, res, next) => {
     var _a;
     const token = (_a = req.header('Authorization')) === null || _a === void 0 ? void 0 : _a.replace('Bearer ', '');
     if (!token) {
@@ -48,18 +38,17 @@ const authAndTeacherMiddleware = (req, res, next) => __awaiter(void 0, void 0, v
     }
     try {
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        const userId = req.user.id;
-        const user = yield User_1.User.findById(userId).select('role');
-        if ((user === null || user === void 0 ? void 0 : user.role) === 'teacher') {
+        req.user = { id: decoded.id };
+        if (decoded.role === 'admin' || decoded.role === 'teacher') {
+            console.log('Access granted. User is a teacher or admin.');
             next();
         }
         else {
-            res.status(403).json({ message: 'Access denied. You must be a teacher.' });
+            res.status(403).json({ message: 'Access denied. You must be a teacher or admin.' });
         }
     }
     catch (err) {
         res.status(401).json({ message: 'Token is not valid', error: err.message });
     }
-});
+};
 exports.authAndTeacherMiddleware = authAndTeacherMiddleware;
