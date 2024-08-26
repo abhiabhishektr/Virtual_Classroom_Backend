@@ -38,7 +38,12 @@ export const authService = {
 
 
   verifyToken: (token: string): any => {
-    return jwt.verify(token, JWT_SECRET);
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+      return decoded as { id: string, role: string }; // Return the decoded payload
+    } catch (err) {
+      throw new Error('Invalid token');
+    }
   },
 
   storeRefreshToken: async (userId: string, refreshToken: string): Promise<void> => {

@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTeacherRequest = exports.updateTeacherRequestStatus = exports.getTeacherRequestById = exports.getAllTeacherRequests = exports.findOne = exports.createTeacherRequest = void 0;
+// src/application/repositories/teacherRepository.ts
 const TeacherRequest_1 = __importDefault(require("../../infrastructure/database/models/TeacherRequest"));
 // Create a new teacher request
 const createTeacherRequest = (data) => __awaiter(void 0, void 0, void 0, function* () {

@@ -4,8 +4,7 @@ import { ICourse } from '../../infrastructure/database/models/Course';
 import { CourseDTO, courseListingDTO, CourseTeacherDTO, mapToCourseListingDTO } from '../../interfaces/dots/CourseDTO';
 
 export const createNewCourse = async (courseData: ICourse): Promise<ICourse> => {
-  console.log("courseData",courseData);
-  
+  // console.log("courseData",courseData);
   return createCourse(courseData);
 };
 

@@ -13,3 +13,13 @@ redisClient.on('error', (err) => {
 });
 
 export { redisClient };
+
+
+// redis-cli KEYS *
+
+
+// $keys = redis-cli KEYS *
+// foreach ($key in $keys) {
+//     $value = redis-cli GET $key
+//     Write-Output "$key -> $value"
+// }

@@ -1,4 +1,3 @@
-"use strict";
 // // backend/src/interfaces/controllers/notificationController.ts
 // import { Request, Response } from 'express';
 // import { getNotifications } from '../../application/use-cases/notification';

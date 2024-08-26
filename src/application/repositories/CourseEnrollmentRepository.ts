@@ -6,20 +6,26 @@ import { User } from '../../infrastructure/database/models/User';
 
 export interface IUserCourseRepository {
     getUserPurchasedCourses(userId: string): Promise<ICourse[]>;
+    groups(userId: string): Promise<string[]>;
     enrollCourse(userId: string, courseId: string, paymentId?: string, amount?: number): Promise<IEnrollment>;
     getEnrollment(userId: string, paymentId?: string, courseId?: string): Promise<IEnrollment | null>;
     getCourseById(courseId: string): Promise<ICourse | null>; // Added to fetch course details
     getCourseAmountById(courseId: string): Promise<number | null>;
     isCoursePurchased(userId: string, courseId: string): Promise<boolean>;
+    getCourseDetailsWithContents(userId: string, courseId: string): Promise<{ course: ICourse | null, isPurchased: boolean, modules: any[]  }>; 
+
 }
+
 
 export const createUserCourseRepository = (): IUserCourseRepository => ({
     getUserPurchasedCourses: async (userId: string): Promise<ICourse[]> => {
         const userIdObj = mongoose.Types.ObjectId(userId); // Convert to ObjectId
 
         // Find all enrollments for the given user
-        const enrollments = await EnrollmentModel.find({ userId: userIdObj });
-
+        const enrollments = await EnrollmentModel.find({
+            userId: userIdObj,
+            'courses.status': 'paid' // Ensure the enrollment status is 'paid'
+        });
         // Extract course IDs from enrollments
         const courseIds = enrollments
             .map(enrollment => enrollment.courses.map(courseDetail => courseDetail.courseId))
@@ -27,6 +33,51 @@ export const createUserCourseRepository = (): IUserCourseRepository => ({
 
         // Find all courses based on the extracted course IDs
         return await CourseModel.find({ _id: { $in: courseIds } }, { instructorId: 0 });
+    },
+    groups: async (userId: string): Promise<string[]> => {
+        const userIdObj = mongoose.Types.ObjectId(userId); 
+        const enrollments = await EnrollmentModel.aggregate([
+            { $match: { userId: userIdObj } },
+            
+            { 
+                $unwind: "$courses" 
+            },
+            { $match: { "courses.status": "paid" } },
+            { 
+                $lookup: {
+                    from: "courses", 
+                    localField: "courses.courseId",
+                    foreignField: "_id",
+                    as: "courseDetails"
+                }
+            },
+            { $unwind: "$courseDetails" }, 
+            { 
+                $addFields: {
+                    "courseDetails.instructorId": { $toObjectId: "$courseDetails.instructorId" }
+                }
+            },
+            { 
+                $lookup: {
+                    from: "users",
+                    localField: "courseDetails.instructorId",
+                    foreignField: "_id",
+                    as: "instructorDetails"
+                }
+            },
+            { $unwind: "$instructorDetails" },
+            {
+                $project: {
+                    _id: 0, 
+                    groupId: "$courses.courseId",
+                    groupName: "$courseDetails.title",
+                    teacherEmail: "$instructorDetails.email"
+                }
+            }
+        ]);
+        
+    
+        return enrollments;
     },
     enrollCourse: async (userId: string, courseId: string, paymentId?: string, amount?: number): Promise<IEnrollment> => {
         const userIdObj = mongoose.Types.ObjectId(userId); // Convert to ObjectId
@@ -44,21 +95,21 @@ export const createUserCourseRepository = (): IUserCourseRepository => ({
         return await newEnrollment.save();
     },
     getEnrollment: async (userId: string, paymentId?: string, courseId?: string): Promise<IEnrollment | null> => {
-        const userIdObj =  mongoose.Types.ObjectId(userId);
+        const userIdObj = mongoose.Types.ObjectId(userId);
         console.log(`userIdObj: ${userIdObj} paymentId: ${paymentId}`);
-        
+
         // First, let's just try to find the document
         const data = await EnrollmentModel.findOne({
             userId: userIdObj,
             'courses.paymentId': paymentId
         });
         console.log('Found data:', data);
-    
+
         if (!data) {
             console.log('No matching document found');
             return null;
         }
-    
+
         // If we found a document, now let's update it
         const enrollment = await EnrollmentModel.findOneAndUpdate(
             {
@@ -72,7 +123,7 @@ export const createUserCourseRepository = (): IUserCourseRepository => ({
             await CourseModel.findByIdAndUpdate(courseId, { $inc: { enrollmentCount: 1 } });
         }
         console.log('Updated enrollment:', enrollment);
-    
+
         return enrollment;
     },
     getCourseById: async (courseId: string): Promise<ICourse | null> => {
@@ -143,14 +194,121 @@ export const createUserCourseRepository = (): IUserCourseRepository => ({
     isCoursePurchased: async (userId: string, courseId: string): Promise<boolean> => {
         const userIdObj = mongoose.Types.ObjectId(userId);
         const courseIdObj = mongoose.Types.ObjectId(courseId);
-
-        // Check if there is an enrollment for the user with the given course ID
+    
+        // Check if there is an enrollment for the user with the given course ID and status is 'paid'
         const enrollment = await EnrollmentModel.findOne({
             userId: userIdObj,
-            'courses.courseId': courseIdObj
+            'courses.courseId': courseIdObj,
+            'courses.status': 'paid'
         });
-
-        // Return true if enrollment exists, otherwise false
+    
+        // Return true if enrollment exists with 'paid' status, otherwise false
         return !!enrollment;
+    },
+    getCourseDetailsWithContents: async (userId: string, courseId: string): Promise<{ course: ICourse | null, isPurchased: boolean, modules: any[] }> => {
+        const userIdObj = mongoose.Types.ObjectId(userId);
+        const courseIdObj = mongoose.Types.ObjectId(courseId);
+        const result = await CourseModel.aggregate([
+            { $match: { _id: courseIdObj } },
+            {
+                $lookup: {
+                    from: 'enrollments',
+                    let: { courseId: courseIdObj, userId: userIdObj },
+                    pipeline: [
+                        { $unwind: "$courses" },
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$userId", "$$userId"] },
+                                        { $eq: ["$courses.courseId", "$$courseId"] },
+                                        { $eq: ["$courses.status", "paid"] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'enrollments'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'modules',
+                    let: { courseId: courseIdObj },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$courseId", "$$courseId"] } } },
+                        { $unwind: "$modules" },
+                        {
+                            $project: {
+                                _id: "$modules._id",
+                                title: "$modules.title",
+                                contents: {
+                                    $map: {
+                                        input: {
+                                            $cond: [
+                                                { $gt: [{ $size: { $ifNull: ["$enrollments", []] } }, 0] },
+                                                "$modules.contents",
+                                                {
+                                                    $map: {
+                                                        input: "$modules.contents",
+                                                        as: "content",
+                                                        in: {
+                                                            $mergeObjects: [
+                                                                "$$content",
+                                                                { url: { $cond: [{ $eq: ["$$content.type", "video"] }, "$$content.url", "$$REMOVE"] } }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        },
+                                        as: "content",
+                                        in: "$$content"
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    as: 'modules'
+                }
+            },
+            {
+                $addFields: {
+                    instructorId: { $toObjectId: "$instructorId" }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'instructorId',
+                    foreignField: '_id',
+                    as: 'instructorDetails'
+                }
+            },
+            {
+                $addFields: {
+                    isPurchased: { $gt: [{ $size: { $ifNull: ["$enrollments", []] } }, 0] },
+                    instructorEmail: { $arrayElemAt: ["$instructorDetails.email", 0] },
+                    instructorName: { $arrayElemAt: ["$instructorDetails.name", 0] },
+                    instructorProfilePicture: { $arrayElemAt: ["$instructorDetails.profilePicture", 0] }
+                }
+            },
+            {
+                $project: {
+                    instructorId: 0,
+                    enrollments: 0,
+                    instructorDetails: 0
+                }
+            }
+        ]);
+    
+        if (result.length > 0) {
+            const course = result[0];
+            return { course, isPurchased: course.isPurchased, modules: course.modules };
+        } else {
+            return { course: null, isPurchased: false, modules: [] };
+        }
     }
+    
+    
 });

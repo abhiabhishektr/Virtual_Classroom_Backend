@@ -1,4 +1,3 @@
-"use strict";
 // // backend/src/application/use-cases/classroom/startClassroom.ts
 // import { classroomRepository } from '../../repositories/classroomRepository';
 // export const startClassroom = async (user: any, classroomDetails: any) => {

@@ -1,4 +1,3 @@
-"use strict";
 // // backend/src/application/use-cases/classroom/joinClassroom.ts
 // import { classroomRepository } from '../../repositories/classroomRepository';
 // import { Classroom } from '../../domain/entities/Classroom';

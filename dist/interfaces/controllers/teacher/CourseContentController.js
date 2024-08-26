@@ -31,11 +31,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteContent = exports.deleteModule = exports.updateModule = exports.getModuleById = exports.addModule = exports.getCourseModules = void 0;
+exports.uploadContent = exports.deleteContent = exports.deleteModule = exports.updateModule = exports.getModuleById = exports.addModule = exports.getCourseModules = void 0;
 const CourseContentUseCase_1 = require("../../../application/use-cases/course/CourseContentUseCase");
 const CourseContentRepository_1 = require("../../../application/repositories/CourseContentRepository");
 const courseService = __importStar(require("../../../application/services/courseService"));
+const cloudinaryConfig_1 = __importDefault(require("../../../infrastructure/cloudinaryConfig"));
 // Instantiate the repository and use case
 const repository = (0, CourseContentRepository_1.createCourseContentRepository)();
 const courseContentUseCase = (0, CourseContentUseCase_1.createCourseContentUseCase)(repository);
@@ -126,20 +130,20 @@ exports.updateModule = updateModule;
 const deleteModule = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const chapterId = req.params.chapterId;
-        const { courseId, moduleId } = req.body.courseId; // Ensure you pass courseId to the handler
+        const { moduleId, courseId } = req.body; // Ensure you pass courseId to the handler
         // Check if the module exists
-        const module = yield courseContentUseCase.getModuleById(moduleId);
-        if (!module) {
-            res.status(404).json({ message: 'Module not found' });
-            return;
-        }
+        // const module = await courseContentUseCase.getModuleById(moduleId);
+        // if (!module) {
+        //     res.status(404).json({ message: 'Module not found' });
+        //     return;
+        // }
         // Check if the course associated with the module exists
-        const course = yield courseService.getCourseDetails(courseId);
-        if (!course) {
-            res.status(404).json({ message: 'Associated course not found' });
-            return;
-        }
-        yield courseContentUseCase.deleteModule(moduleId, courseId);
+        // const course = await courseService.getCourseDetails(courseId);
+        // if (!course) {
+        //     res.status(404).json({ message: 'Associated course not found' });
+        //     return;
+        // }
+        yield courseContentUseCase.deleteModule(moduleId, chapterId, courseId);
         res.status(200).json({ message: 'Module deleted successfully' });
     }
     catch (error) {
@@ -150,7 +154,6 @@ exports.deleteModule = deleteModule;
 const deleteContent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { chapterId, moduleId, contentId, courseId } = req.body; // Ensure you pass courseId to the handler
-        console.log(`moduelId: ${moduleId}  contentId: ${contentId} courseId: ${courseId} chapterId: ${chapterId}`);
         // Check if the module exists
         const module = yield courseContentUseCase.getModuleById(moduleId);
         if (!module) {
@@ -172,3 +175,26 @@ const deleteContent = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.deleteContent = deleteContent;
+const uploadContent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { courseId, moduleId, chapterId } = req.params;
+        const file = req.file;
+        if (!file) {
+            res.status(400).json({ error: 'No file uploaded' });
+            return;
+        }
+        const fileStr = file.buffer.toString('base64');
+        // Upload to Cloudinary
+        const uploadResponse = yield cloudinaryConfig_1.default.uploader.upload(`data:${file.mimetype};base64,${fileStr}`, {
+            folder: `courses/${courseId}/modules/${moduleId}/chapters/${chapterId}`,
+            resource_type: 'auto',
+        });
+        // The Cloudinary URL is available in the response
+        const publicUrl = uploadResponse.secure_url;
+        res.status(200).json({ message: 'Content uploaded successfully', url: publicUrl });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.uploadContent = uploadContent;

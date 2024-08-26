@@ -33,6 +33,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateTeacherRequestStatus = exports.getTeacherRequestById = exports.getAllTeacherRequests = void 0;
+// src/application/use-cases/Teacher/teacherRequestUseCases.ts
 const teacherRepository = __importStar(require("../../repositories/teacherRepository"));
 // Create a new teacher request
 // export const createTeacherRequest = async (data: {

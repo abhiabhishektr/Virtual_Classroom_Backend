@@ -1,4 +1,3 @@
-"use strict";
 // // backend/src/interfaces/controllers/classroomController.ts
 // import { Request, Response } from 'express';
 // import { startClassroom as startClassroomUseCase } from '../../application/use-cases/classroom/startClassroom';

@@ -30,14 +30,18 @@ const createCourseContentRepository = () => ({
         const moduleIdObj = mongoose_1.default.Types.ObjectId(moduleId);
         return yield CourseContent_1.default.findByIdAndUpdate(moduleIdObj, { $set: updatedDetails }, { new: true });
     }),
-    deleteModule: (moduleId, courseId) => __awaiter(void 0, void 0, void 0, function* () {
+    deleteModule: (moduleId, chapterId, courseId) => __awaiter(void 0, void 0, void 0, function* () {
         const moduleIdObj = mongoose_1.default.Types.ObjectId(moduleId);
         const courseIdObj = mongoose_1.default.Types.ObjectId(courseId);
+        const chapterIdObj = mongoose_1.default.Types.ObjectId(chapterId);
         const module = yield CourseContent_1.default.findOne({ _id: moduleIdObj, courseId: courseIdObj });
         if (!module) {
             throw new Error("Module not found or does not belong to the given course");
         }
-        yield CourseContent_1.default.findByIdAndDelete(moduleIdObj);
+        const result = yield CourseContent_1.default.updateOne({ _id: moduleIdObj, 'modules._id': chapterIdObj, courseId: courseIdObj }, { $pull: { modules: { _id: chapterIdObj } } });
+        if (result.nModified === 0) {
+            throw new Error("Content not found in the module");
+        }
     }),
     getModuleById: (moduleId) => __awaiter(void 0, void 0, void 0, function* () {
         const moduleIdObj = mongoose_1.default.Types.ObjectId(moduleId);

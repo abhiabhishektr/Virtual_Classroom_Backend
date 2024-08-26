@@ -1,4 +1,3 @@
-"use strict";
 // // src/domain/repositories/teacherRepository.ts
 // import { Teacher } from '../entities/teacher';
 // interface TeacherRepository {

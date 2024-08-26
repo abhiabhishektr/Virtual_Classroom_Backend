@@ -25,12 +25,14 @@ import {
     getModuleById,
     updateModule,
     deleteModule,
-    deleteContent
+    deleteContent,
+    uploadContent
 } from '../../controllers/teacher/CourseContentController';
-import checkCourseOwnership from '../../middlewares/courseOwnership';
 
 
 const router = Router();
+
+const uploadvideo = multer({ storage: multer.memoryStorage() }).single('file');
 
 // Setup multer for handling file uploads with file size limit (e.g., 1MB)
 const upload = multer({ 
@@ -83,19 +85,39 @@ router.delete('/deleteCourse/:id', deleteCourse);
 
 
 
-router.post('/modules',checkCourseOwnership, addModule);
+
+
+router.post('/modules', addModule);
 router.get('/modules/course/:courseId', getCourseModules);
-router.get('/modules/:moduleId', getModuleById);// not using now
+router.get('/modules/:moduleId', getModuleById); // not using now
 
 
-router.put('/modules/:moduleId',checkCourseOwnership, updateModule);
-router.delete('/modules/:chapterId',checkCourseOwnership, deleteModule);
-router.delete('/modules',checkCourseOwnership, deleteContent);
+router.post('/content/:courseId/modules/:moduleId/contents', uploadvideo, uploadContent);
+router.put('/modules/:moduleId', updateModule);
+// router.put('/modules/:moduleId', updateChapter);
+router.delete('/modules/:chapterId', deleteModule);
 
 
 
-
-
+// router.put('/content', updateContent);
+router.delete('/content', deleteContent);
 
 
 export default router;
+
+
+
+
+
+
+
+
+
+// import checkCourseOwnership from '../../middlewares/courseOwnership';
+// router.post('/modules',checkCourseOwnership, addModule);
+// router.get('/modules/course/:courseId', getCourseModules);
+// router.get('/modules/:moduleId', getModuleById);// not using now
+// router.put('/modules/:moduleId',checkCourseOwnership, updateModule);
+// router.delete('/modules/:chapterId',checkCourseOwnership, deleteModule);
+// router.delete('/modules',checkCourseOwnership, deleteContent);
+

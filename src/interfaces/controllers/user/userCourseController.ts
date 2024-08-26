@@ -5,10 +5,15 @@ import { createUserCourseRepository } from '../../../application/repositories/Co
 import { User } from '../../../types/user';
 import { ExtendedCourse, ICourse } from '../../../infrastructure/database/models/Course';
 import { mapToCourseListingDTO } from '../../dots/CourseDTO';
+import { createReviewRepository } from '../../../application/repositories/ReviewRepository';
+import { createReviewUseCase } from '../../../application/use-cases/user/ReviewUseCase';
 
 
 const userRepository = createUserCourseRepository();
 const useCase = createUserCourseUseCase(userRepository);
+
+const reviewRepository = createReviewRepository();
+const reviewUseCase = createReviewUseCase(reviewRepository);
 
 export const getUserPurchasedCourses = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -55,20 +60,32 @@ export const getCourseDetails = async (req: Request, res: Response): Promise<voi
             return;
         }
 
-        const course: ICourse | null = await useCase.getCourseDetails(courseId);
+        // Fetch course details with contents
+        const limitContents = 0; // Default limit for contents
+        const { course, isPurchased, modules } = await useCase.getCourseDetailsWithContents(userId, courseId);
+        console.log("modules: ", modules[0].contents);
+        console.log("isPurchased: ", isPurchased);
+        // console.log("course: ", course);
+
         if (!course) {
             res.status(404).json({ message: 'Course not found' });
             return;
         }
 
-        // Check if the course is purchased by the user
-        const isPurchased = userId ? await useCase.isCoursePurchased(userId, courseId) : false;
+        // If the course is purchased, fetch all contents
+        const finalModules = isPurchased ? modules : modules.map(module => ({
+            ...module,
+            contents: module.contents.map(content => ({ ...content, url: undefined })) // Hide URLs if not purchased
+        }));
+        console.log("finalModules: ", finalModules[0].contents);
 
-        // Combine course details with additional property
+        // Combine course details with additional properties
         const responseData = {
             ...course,
-            isPurchased
+            isPurchased,
+            modules: finalModules
         };
+        // console.log("responseData: ", responseData);
 
         res.status(200).json({
             data: responseData
@@ -77,7 +94,6 @@ export const getCourseDetails = async (req: Request, res: Response): Promise<voi
         res.status(500).json({ message: 'Error fetching course details', error });
     }
 };
-
 
 
 interface PurchaseDTO {

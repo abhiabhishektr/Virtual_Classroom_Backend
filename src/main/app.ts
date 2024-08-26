@@ -7,6 +7,7 @@ import { errorHandler } from '../interfaces/middlewares/errorHandler';
 import { authMiddleware } from '../interfaces/middlewares/authMiddleware';
 import authenticationRoutes from '../interfaces/routes/authenticationRoutes';
 import profileRoutes from '../interfaces/routes/profileRoutes';
+import chatRoutes from '../interfaces/routes/live&Chat/chatRoutes';
 import TeacherRoutes from '../interfaces/routes/teacher/TeacherRoutes';
 // import classroomRoutes from '../interfaces/routes/classroomRoutes';
 // import notificationRoutes from '../interfaces/routes/notificationRoutes';
@@ -60,9 +61,9 @@ export class App {
 
     this.app.use('/api/auth', authenticationRoutes);
     this.app.use('/api/profile', authMiddleware, profileRoutes);
-
+    this.app.use('/api/chat', authMiddleware, chatRoutes);
+    
     this.app.use('/api/teacher', authAndTeacherMiddleware, TeacherRoutes);
-
     // this.app.use('/api/classroom', authMiddleware, classroomRoutes);
     // this.app.use('/api/notifications', authMiddleware, notificationRoutes);
     // --------admin routes-----------

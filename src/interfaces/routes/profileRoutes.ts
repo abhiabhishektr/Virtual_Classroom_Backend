@@ -5,7 +5,7 @@ import { getCourses } from '../controllers/teacher/courseController';
 import {
     getUserPurchasedCourses,
     checkCoursePurchased, 
-    getCourseDetails, // Import the new controller method
+    getCourseDetails, 
     CoursePurchaseHistory
 } from '../controllers/user/userCourseController';
 import {
@@ -13,6 +13,13 @@ import {
     , verifyOrder
 } from '../controllers/user/coursePaymentController';
 
+
+import {
+    addCourseReview,
+    updateCourseReview,
+    getCourseReviews,
+    getUserReviewForCourse
+} from '../controllers/user/courseReviewController';
 
 const router = Router();
 
@@ -33,8 +40,21 @@ router.get('/user-courses', getUserPurchasedCourses); // Fetch user's purchased 
 router.get('/course/:courseId/purchased', checkCoursePurchased); // Check if a course is purchased (not using now)
 router.get('/course/:courseId', getCourseDetails); // Fetch course details by ID
 router.get('/coursePurchaseHistory', CoursePurchaseHistory); // Fetch course details by ID
+ 
+
+// Reviews
+router.post('/:courseId/reviews', addCourseReview);
+router.put('/:courseId/reviews/:reviewId', updateCourseReview);
+router.get('/:courseId/reviews', getCourseReviews);
+router.get('/:courseId/reviews/user', getUserReviewForCourse); //(not using now)
 
 //paymet
 router.post('/payment/orders', createOrder);
 router.post('/payment/verify', verifyOrder);
+
+
+
+
+
+
 export default router;

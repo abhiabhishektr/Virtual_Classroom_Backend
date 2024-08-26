@@ -21,8 +21,8 @@ const createCourseContentUseCase = (repository) => ({
     updateModule: (moduleId, updatedDetails) => __awaiter(void 0, void 0, void 0, function* () {
         return repository.updateModule(moduleId, updatedDetails);
     }),
-    deleteModule: (moduleId, courseId) => __awaiter(void 0, void 0, void 0, function* () {
-        return repository.deleteModule(moduleId, courseId);
+    deleteModule: (moduleId, chapterId, courseId) => __awaiter(void 0, void 0, void 0, function* () {
+        return repository.deleteModule(moduleId, chapterId, courseId);
     }),
     getModuleById: (moduleId) => __awaiter(void 0, void 0, void 0, function* () {
         return repository.getModuleById(moduleId);

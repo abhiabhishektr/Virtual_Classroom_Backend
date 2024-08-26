@@ -22,9 +22,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const multer_1 = __importStar(require("multer"));
@@ -32,8 +29,8 @@ const teacherReqController_1 = require("../../controllers/teacher/teacherReqCont
 // Middleware to handle file upload errors
 const courseController_1 = require("../../controllers/teacher/courseController");
 const CourseContentController_1 = require("../../controllers/teacher/CourseContentController");
-const courseOwnership_1 = __importDefault(require("../../middlewares/courseOwnership"));
 const router = (0, express_1.Router)();
+const uploadvideo = (0, multer_1.default)({ storage: multer_1.default.memoryStorage() });
 // Setup multer for handling file uploads with file size limit (e.g., 1MB)
 const upload = (0, multer_1.default)({
     storage: multer_1.default.memoryStorage(),
@@ -73,10 +70,20 @@ router.get('/getCoursesbyTeacher', courseController_1.getCoursesbyTeacher);
 router.get('/getCourseByIdTeacher/:id', courseController_1.getCourse);
 // Route to delete a course
 router.delete('/deleteCourse/:id', courseController_1.deleteCourse);
-router.post('/modules', courseOwnership_1.default, CourseContentController_1.addModule);
+router.post('/modules', CourseContentController_1.addModule);
 router.get('/modules/course/:courseId', CourseContentController_1.getCourseModules);
 router.get('/modules/:moduleId', CourseContentController_1.getModuleById); // not using now
-router.put('/modules/:moduleId', courseOwnership_1.default, CourseContentController_1.updateModule);
-router.delete('/modules/:chapterId', courseOwnership_1.default, CourseContentController_1.deleteModule);
-router.delete('/modules', courseOwnership_1.default, CourseContentController_1.deleteContent);
+router.post('/content/:courseId/modules/:moduleId/chapters/:chapterId/contents', uploadvideo.single('file'), CourseContentController_1.uploadContent);
+router.put('/modules/:moduleId', CourseContentController_1.updateModule);
+// router.put('/modules/:moduleId', updateChapter);
+router.delete('/modules/:chapterId', CourseContentController_1.deleteModule);
+// router.put('/content', updateContent);
+router.delete('/content', CourseContentController_1.deleteContent);
 exports.default = router;
+// import checkCourseOwnership from '../../middlewares/courseOwnership';
+// router.post('/modules',checkCourseOwnership, addModule);
+// router.get('/modules/course/:courseId', getCourseModules);
+// router.get('/modules/:moduleId', getModuleById);// not using now
+// router.put('/modules/:moduleId',checkCourseOwnership, updateModule);
+// router.delete('/modules/:chapterId',checkCourseOwnership, deleteModule);
+// router.delete('/modules',checkCourseOwnership, deleteContent);
