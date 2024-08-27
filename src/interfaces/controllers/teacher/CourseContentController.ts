@@ -101,6 +101,24 @@ export const updateModule = async (req: Request, res: Response): Promise<void> =
     }
 };
 
+export const renameModule = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { courseId, moduleId, chapterId } = req.params;
+        console.log("chapterId: ", chapterId);
+        console.log("moduleId: ", moduleId);
+        console.log("courseId: ", courseId);
+        console.log("req.body: ", req.body);
+        const { title} = req.body;
+       await courseContentUseCase.renameModule(courseId, moduleId, chapterId, title);
+       res.status(200).json("updatedModule");
+    } catch (error: any) {
+        console.log("error: ", error);
+        
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
 // Handler to delete a module by ID
 export const deleteModule = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -154,6 +172,33 @@ export const deleteContent = async (req: Request, res: Response): Promise<void> 
     }
 };
 
+
+
+export const updateContent = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { chapterId, moduleId, contentId, courseId, newTitle } = req.body.data;
+
+        // Validate required fields
+        if (!chapterId || !moduleId || !contentId || !courseId || !newTitle) {
+            res.status(400).json({ error: 'Missing required fields' });
+            return;
+        }
+
+        // Call the use case
+        const updatedContent = await courseContentUseCase.updateContent(moduleId,courseId,chapterId, contentId, newTitle);
+
+        if (!updatedContent) {
+            res.status(404).json({ error: 'Content not found' });
+            return;
+        }
+
+        // Return the updated content
+        res.status(200).json(updatedContent);
+    } catch (error: any) {
+        console.error('Error updating content:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
 
 
 export const uploadContent = async (req: Request, res: Response): Promise<void> => {

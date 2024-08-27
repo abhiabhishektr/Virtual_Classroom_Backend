@@ -205,9 +205,10 @@ export const createUserCourseRepository = (): IUserCourseRepository => ({
         // Return true if enrollment exists with 'paid' status, otherwise false
         return !!enrollment;
     },
-    getCourseDetailsWithContents: async (userId: string, courseId: string): Promise<{ course: ICourse | null, isPurchased: boolean, modules: any[] }> => {
+    getCourseDetailsWithContents: async (userId: string, courseId: string): Promise<{ course: ICourse | null, isPurchased: boolean, modules: any[], rating: number }> => {
         const userIdObj = mongoose.Types.ObjectId(userId);
         const courseIdObj = mongoose.Types.ObjectId(courseId);
+    
         const result = await CourseModel.aggregate([
             { $match: { _id: courseIdObj } },
             {
@@ -239,6 +240,31 @@ export const createUserCourseRepository = (): IUserCourseRepository => ({
                         { $match: { $expr: { $eq: ["$courseId", "$$courseId"] } } },
                         { $unwind: "$modules" },
                         {
+                            $lookup: {
+                                from: 'userprogresses',
+                                let: { courseId: courseIdObj, userId: userIdObj },
+                                pipeline: [
+                                    { $match: { $expr: { $and: [
+                                        { $eq: ["$courseId", "$$courseId"] },
+                                        { $eq: ["$userId", "$$userId"] }
+                                    ] } } },
+                                    {
+                                        $project: {
+                                            _id: 0,
+                                            completedContentIds: 1,
+                                            importantContentIds: 1
+                                        }
+                                    }
+                                ],
+                                as: 'userProgress'
+                            }
+                        },
+                        {
+                            $addFields: {
+                                userProgress: { $arrayElemAt: ["$userProgress", 0] }
+                            }
+                        },
+                        {
                             $project: {
                                 _id: "$modules._id",
                                 title: "$modules.title",
@@ -255,7 +281,11 @@ export const createUserCourseRepository = (): IUserCourseRepository => ({
                                                         in: {
                                                             $mergeObjects: [
                                                                 "$$content",
-                                                                { url: { $cond: [{ $eq: ["$$content.type", "video"] }, "$$content.url", "$$REMOVE"] } }
+                                                                {
+                                                                    url: { $cond: [{ $eq: ["$$content.type", "video"] }, "$$content.url", "$$REMOVE"] },
+                                                                    isCompleted: { $in: ["$$content._id", { $ifNull: ["$userProgress.completedContentIds", []] }] },
+                                                                    isImportant: { $in: ["$$content._id", { $ifNull: ["$userProgress.importantContentIds", []] }] }
+                                                                }
                                                             ]
                                                         }
                                                     }
@@ -273,8 +303,20 @@ export const createUserCourseRepository = (): IUserCourseRepository => ({
                 }
             },
             {
+                $lookup: {
+                    from: 'reviews',
+                    let: { courseId: courseIdObj },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$courseId", "$$courseId"] } } },
+                        { $group: { _id: "$courseId", averageRating: { $avg: "$rating" } } }
+                    ],
+                    as: 'rating'
+                }
+            },
+            {
                 $addFields: {
-                    instructorId: { $toObjectId: "$instructorId" }
+                    instructorId: { $toObjectId: "$instructorId" },
+                    rating: { $ifNull: [{ $arrayElemAt: ["$rating.averageRating", 0] }, 0] }
                 }
             },
             {
@@ -304,11 +346,15 @@ export const createUserCourseRepository = (): IUserCourseRepository => ({
     
         if (result.length > 0) {
             const course = result[0];
-            return { course, isPurchased: course.isPurchased, modules: course.modules };
+            return { course, isPurchased: course.isPurchased, modules: course.modules, rating: course.rating };
         } else {
-            return { course: null, isPurchased: false, modules: [] };
+            return { course: null, isPurchased: false, modules: [], rating: 0 };
         }
     }
     
     
+    
+    
 });
+
+// 11

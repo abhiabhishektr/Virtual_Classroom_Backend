@@ -20,6 +20,7 @@ import {
     getCourseReviews,
     getUserReviewForCourse
 } from '../controllers/user/courseReviewController';
+import { markContentAsCompleted, markContentAsImportant, unmarkContentAsCompleted, unmarkContentAsImportant } from '../controllers/user/userProgressController';
 
 const router = Router();
 
@@ -53,6 +54,13 @@ router.post('/payment/orders', createOrder);
 router.post('/payment/verify', verifyOrder);
 
 
+
+
+// mark import content & checkbox bookmark
+router.post('/content/:contentId/complete', markContentAsCompleted);
+router.post('/content/:contentId/uncomplete', unmarkContentAsCompleted);
+router.post('/content/:contentId/important', markContentAsImportant);
+router.post('/content/:contentId/unimportant', unmarkContentAsImportant);
 
 
 

@@ -29,9 +29,10 @@ export const createCourseContentUseCase = (repository: ICourseContentRepository)
     addContent: async (courseId: string, moduleId: string, chapterId: string, contentDetails: IContent): Promise<IContent> => {
         return repository.addContent(courseId, moduleId, contentDetails);
     },
-    
-
-    // updateContent: async (moduleId: string, contentId: string, updatedDetails: Partial<IContent>): Promise<IContent | null> => {
-    //     return repository.updateContent(moduleId, contentId, updatedDetails);
-    // },
+    updateContent: async (moduleId: string,courseId: string,chapterId: string ,contentId: string, newTitle: string): Promise<IContent | null> => {
+        return repository.updateContent(moduleId,courseId,chapterId ,contentId, newTitle);
+    },
+    renameModule: async (courseId: string, moduleId: string, chapterId: string, newTitle: string): Promise<void> => {
+        return repository.renameModule(courseId, moduleId, chapterId, newTitle);
+    }
 });

@@ -26,7 +26,9 @@ import {
     updateModule,
     deleteModule,
     deleteContent,
-    uploadContent
+    updateContent,
+    uploadContent,
+    renameModule
 } from '../../controllers/teacher/CourseContentController';
 
 
@@ -94,12 +96,13 @@ router.get('/modules/:moduleId', getModuleById); // not using now
 
 router.post('/content/:courseId/modules/:moduleId/contents', uploadvideo, uploadContent);
 router.put('/modules/:moduleId', updateModule);
+router.put('/courses/:courseId/modules/:moduleId/chapters/:chapterId', renameModule);
 // router.put('/modules/:moduleId', updateChapter);
 router.delete('/modules/:chapterId', deleteModule);
 
 
 
-// router.put('/content', updateContent);
+router.put('/content', updateContent);
 router.delete('/content', deleteContent);
 
 
