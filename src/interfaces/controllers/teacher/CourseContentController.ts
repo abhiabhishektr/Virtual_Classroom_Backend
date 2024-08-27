@@ -24,7 +24,7 @@ export const getCourseModules = async (req: Request, res: Response): Promise<voi
             const newModule = await courseContentUseCase.InitializeModule(req.params.courseId);
             moduleData = [newModule]; // Wrap the result in an array
         }
-        
+
         const responseData = {
             title: course.title,
             courseId: course._id, // Assuming 'title' is the property containing the course title
@@ -42,7 +42,7 @@ export const getCourseModules = async (req: Request, res: Response): Promise<voi
 export const addModule = async (req: Request, res: Response): Promise<void> => {
     try {
         // console.log(`req.body: ${JSON.stringify(req.body)}`);
-        
+
         const course = await courseService.getCourseDetails(req.body.courseId);
         if (!course) {
             res.status(404).json({ message: 'Course not found' });
@@ -108,12 +108,10 @@ export const renameModule = async (req: Request, res: Response): Promise<void> =
         console.log("moduleId: ", moduleId);
         console.log("courseId: ", courseId);
         console.log("req.body: ", req.body);
-        const { title} = req.body;
-       await courseContentUseCase.renameModule(courseId, moduleId, chapterId, title);
-       res.status(200).json("updatedModule");
+        const { title } = req.body;
+        await courseContentUseCase.renameModule(courseId, moduleId, chapterId, title);
+        res.status(200).json("updatedModule");
     } catch (error: any) {
-        console.log("error: ", error);
-        
         res.status(500).json({ error: error.message });
     }
 };
@@ -185,7 +183,7 @@ export const updateContent = async (req: Request, res: Response): Promise<void> 
         }
 
         // Call the use case
-        const updatedContent = await courseContentUseCase.updateContent(moduleId,courseId,chapterId, contentId, newTitle);
+        const updatedContent = await courseContentUseCase.updateContent(moduleId, courseId, chapterId, contentId, newTitle);
 
         if (!updatedContent) {
             res.status(404).json({ error: 'Content not found' });
@@ -205,7 +203,7 @@ export const uploadContent = async (req: Request, res: Response): Promise<void> 
     try {
         const { courseId, moduleId } = req.params;
 
-        
+
         const file = req.file;
 
         if (!file) {
@@ -233,12 +231,10 @@ export const uploadContent = async (req: Request, res: Response): Promise<void> 
         };
 
         // Save content details in the database
-        const savedContent = await repository.addContent( courseId,moduleId,contentDetails);
+        const savedContent = await repository.addContent(courseId, moduleId, contentDetails);
+        console.log("savedContent: ", savedContent);
 
-        res.status(200).json({
-            message: 'Content uploaded successfully',
-            content: savedContent,
-        });
+        res.status(200).json({ data: savedContent });
     } catch (error: any) {
         console.error('Error during upload:', error.message);
         res.status(500).json({ error: error.message });

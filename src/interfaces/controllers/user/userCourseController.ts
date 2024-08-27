@@ -24,7 +24,7 @@ export const getUserPurchasedCourses = async (req: Request, res: Response): Prom
         }
         const courses = await useCase.getUserPurchasedCourses(userId);
 
-        res.status(200).json({data :courses.map(mapToCourseListingDTO)});
+        res.status(200).json({data: {courses:courses.map(mapToCourseListingDTO)}});
     } catch (error) {
         res.status(500).json({ message: 'Error fetching purchased courses', error });
     }

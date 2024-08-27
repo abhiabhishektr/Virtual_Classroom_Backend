@@ -108,7 +108,7 @@ export const createCourseContentRepository = (): ICourseContentRepository => ({
             throw new Error("Content not found in the module");
         }
     },
-    addContent: async (courseId: string, moduleId: string, contentDetails: IContent): Promise<IContent> => {
+    addContent: async (courseId: string, moduleId: string, contentDetails: IContent): Promise<any> => {
         console.log("courseId: ", courseId);
         console.log("moduleId: ", moduleId);
         console.log("contentDetails: ", contentDetails);
@@ -150,7 +150,7 @@ export const createCourseContentRepository = (): ICourseContentRepository => ({
         }
 
         // Return the added content
-        return newContent;
+        return updatedCourse;
     },
     updateContent: async (
         moduleId: string,

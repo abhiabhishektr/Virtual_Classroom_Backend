@@ -8,7 +8,7 @@ import { User } from '../../../types/user';
 export const createCourse = async (req: Request, res: Response): Promise<any> => {
 
     try {
-  
+
         // const { error } = courseValidator.validate(req.body);
         // if (error) {
         //     return res.status(400).json({ message: error.details[0].message });
@@ -123,18 +123,67 @@ export const getCourse = async (req: Request, res: Response): Promise<void> => {
         res.status(500).json({ error: error.message });
     }
 };
-// courently not in use , same alternative it the user course servise
-export const getCourses = async (_req: Request, res: Response): Promise<void> => {
-    try {
-        
-        const courses = await courseService.getAllCourseDetails();
-        // console.log("courses", courses);
 
-        res.status(200).json({data:courses});
+//controller
+export const getCourses = async (req: Request, res: Response): Promise<void> => {
+    try {
+        // Extract and convert query parameters
+        const search = typeof req.query.search === 'string' ? req.query.search : '';
+        const sort = typeof req.query.sort === 'string' ? req.query.sort : 'title';
+        console.log("sort: ", sort);
+        const filter = typeof req.query.filter === 'string' ? req.query.filter : '{}';
+        const page = typeof req.query.page === 'string' ? parseInt(req.query.page, 10) : 1;
+        const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 10;
+
+        // Convert filter string to object
+        const filterObj = JSON.parse(filter);
+
+        // Log the extracted values for debugging
+        console.log("Search:", search, "Filter:", filterObj);
+
+        // Get the total number of courses matching the search and filter criteria
+        const totalCourses = await courseService.countDocuments(search, filterObj);
+        console.log("Total Courses:", totalCourses);
+
+        // Fetch the paginated list of courses
+        let courses = await courseService.getAllCourseDetails(
+            search,
+            sort,
+            filterObj,
+            page,
+            limit
+        );
+        const totalPages = Math.ceil(totalCourses / limit);
+
+        // Send the response
+        res.status(200).json({
+            data: {
+                courses,
+                totalPages
+            }
+        });
+
+        // const duplicatedCourses = Array.from({ length: 5 }, () => [...courses]);
+        // courses = duplicatedCourses.reduce((acc, curr) => acc.concat(curr), []);
+
+        // // Recalculate total courses and total pages based on the simulated dataset
+        // const simulatedTotalCourses = courses.length;
+        // const totalPages = Math.ceil(simulatedTotalCourses / limit);
+
+        // // Send the response
+        // res.status(200).json({
+        //     data: {
+        //         courses,
+        //         totalPages
+        //     }
+        // });
     } catch (error: any) {
+        console.error("Error in getCourses:", error.message);
         res.status(500).json({ error: error.message });
     }
 };
+
+
 
 
 export const getCoursesbyTeacher = async (_req: Request, res: Response): Promise<void> => {
@@ -142,7 +191,7 @@ export const getCoursesbyTeacher = async (_req: Request, res: Response): Promise
 
         const courses = await courseService.getAllCourseDetailsbyTeacher((_req.user as User)?.id ?? null);
         // console.log("courses",courses);
-        res.status(200).json({data:courses});
+        res.status(200).json({ data: courses });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
@@ -154,12 +203,11 @@ export const getCoursesbyTeacher = async (_req: Request, res: Response): Promise
 export const updateContents = async (_req: Request, res: Response): Promise<void> => {
     try {
 
-      
+
     } catch (error: any) {
         res.status(500).json({ error: error.message });
     }
 };
-
 
 
 

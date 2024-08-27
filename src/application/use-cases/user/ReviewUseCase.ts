@@ -12,7 +12,8 @@ export const createReviewUseCase = (repository: IReviewRepository) => ({
     addReview: async (userId: string, courseId: string, rating: number, comment: string): Promise<IReview> => {
         const existingReview = await repository.getReviewByUserAndCourse(userId, courseId);
         if (existingReview) {
-            throw new Error('User has already reviewed this course');
+         return   repository.updateReview(userId, courseId, existingReview._id.toString(), rating, comment);            
+            // throw new Error('User has already reviewed this course');
         }
         return repository.addReview(userId, courseId, rating, comment);
     },
