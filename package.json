@@ -4,9 +4,9 @@
   "description": "Educational platform backend",
   "main": "dist/main/server.js",
   "scripts": {
-    "start": "ts-node src/main/server.ts",
+    "start": "node dist/main/server.js",
     "build": "tsc",
-    "dev": "nodemon --watch src --ignore node_modules --delay 1000ms --exec ts-node src/main/server.ts",
+    "dev": "concurrently \"tsc -w\" \"nodemon dist/main/server.js\"",
     "prestart": "yarn build"
   },
   "dependencies": {
@@ -47,6 +47,7 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/morgan": "^1.9.9",
     "@types/node": "^14.14.41",
+    "concurrently": "^8.2.2",
     "nodemon": "^2.0.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3"

@@ -72,6 +72,11 @@ export const authService = {
   },
 
   removeRefreshToken: async (userId: string): Promise<void> => {
-    await redisClient.del(userId);
+    const result = await redisClient.del(userId);
+    if (result) {
+      console.log("Redis deletion successful");
+    } else {
+      console.log("Redis key not found or deletion failed");
+    }
   }
 };

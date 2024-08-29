@@ -124,22 +124,44 @@ export const getCourse = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
+interface FilterObj {
+    categories?: { $in: string[] };
+    price?: { $or: { $lte?: number; $gt?: number }[] };
+}
 //controller
 export const getCourses = async (req: Request, res: Response): Promise<void> => {
     try {
         // Extract and convert query parameters
         const search = typeof req.query.search === 'string' ? req.query.search : '';
         const sort = typeof req.query.sort === 'string' ? req.query.sort : 'title';
-        console.log("sort: ", sort);
         const filter = typeof req.query.filter === 'string' ? req.query.filter : '{}';
         const page = typeof req.query.page === 'string' ? parseInt(req.query.page, 10) : 1;
         const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 10;
+        console.log("limit: ", limit);
 
         // Convert filter string to object
-        const filterObj = JSON.parse(filter);
+        const filterObj: FilterObj = JSON.parse(filter);
 
+        // Ensure categories and priceRange are arrays of strings
+        if (Array.isArray(req.query['limit[categories]'])) {
+            filterObj.categories = { $in: req.query['limit[categories]'] as string[] };
+        }
+
+        if (Array.isArray(req.query['limit[priceRange]'])) {
+            const priceRange = req.query['limit[priceRange]'] as string[];
+            filterObj.price = {
+                $or: priceRange.map(price => {
+                    if (price === '500 and below') return { $lte: 500 };
+                    if (price === '1000 and below') return { $lte: 1000 };
+                    if (price === '5000 and below') return { $lte: 5000 };
+                    if (price === 'Above 5000') return { $gt: 5000 };
+                    return {}; // fallback for unmatched cases
+                }).filter(condition => Object.keys(condition).length > 0) // remove empty conditions
+            };
+        }
+ 
         // Log the extracted values for debugging
-        console.log("Search:", search, "Filter:", filterObj);
+        console.log("Search:", search, "Sort:", sort, "Filter:", filterObj, "Page:", page, "Limit:", limit);
 
         // Get the total number of courses matching the search and filter criteria
         const totalCourses = await courseService.countDocuments(search, filterObj);
@@ -162,7 +184,12 @@ export const getCourses = async (req: Request, res: Response): Promise<void> => 
                 totalPages
             }
         });
-
+    } catch (error: any) {
+        console.error("Error in getCourses:", error.message);
+        res.status(500).json({ error: error.message });
+    }
+};
+ 
         // const duplicatedCourses = Array.from({ length: 5 }, () => [...courses]);
         // courses = duplicatedCourses.reduce((acc, curr) => acc.concat(curr), []);
 
@@ -177,15 +204,10 @@ export const getCourses = async (req: Request, res: Response): Promise<void> => 
         //         totalPages
         //     }
         // });
-    } catch (error: any) {
-        console.error("Error in getCourses:", error.message);
-        res.status(500).json({ error: error.message });
-    }
-};
 
 
 
-
+ 
 export const getCoursesbyTeacher = async (_req: Request, res: Response): Promise<void> => {
     try {
 

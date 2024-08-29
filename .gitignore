@@ -4,7 +4,9 @@ NOTES.md
 test.ts
 test.c
 test.exe
-
+dist/
 # git rm --cached test.c test.exe
 # git rm --cached path/to/your/file
+
+
 

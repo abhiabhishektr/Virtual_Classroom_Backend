@@ -31,6 +31,9 @@ import {
     renameModule
 } from '../../controllers/teacher/CourseContentController';
 
+// ownerShip middleware
+import checkCourseOwnership from '../../middlewares/courseOwnership';
+
 
 const router = Router();
 

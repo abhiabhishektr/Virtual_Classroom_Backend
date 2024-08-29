@@ -21,6 +21,7 @@ import {
     getUserReviewForCourse
 } from '../controllers/user/courseReviewController';
 import { markContentAsCompleted, markContentAsImportant, unmarkContentAsCompleted, unmarkContentAsImportant } from '../controllers/user/userProgressController';
+import { logoutUser } from '../controllers/authenticationController';
 
 const router = Router();
 
@@ -35,6 +36,7 @@ router.get('/teacher-request-status', teacherRequestStatus);
 
 // Course routes for teachers
 router.get('/all-courses', getCourses);
+
 
 // User course routes
 router.get('/user-courses', getUserPurchasedCourses); // Fetch user's purchased courses
@@ -65,4 +67,5 @@ router.post('/content/:contentId/unimportant', unmarkContentAsImportant);
 
 
 
+router.post('/logout', logoutUser);
 export default router;

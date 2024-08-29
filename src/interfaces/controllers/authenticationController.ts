@@ -64,7 +64,9 @@ export const loginAdmin = async (req: Request, res: Response) => {
 
 export const logoutUser = (req: Request, res: Response) => {
   try {
-    logoutUserUseCase(req.user); // Assuming this function handles the logout logic
+    const user = (req as any).user;
+
+    logoutUserUseCase(user); // Assuming this function handles the logout logic
     res.status(200).json({ message: 'Logged out successfully' });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
