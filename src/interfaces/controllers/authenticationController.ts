@@ -100,8 +100,19 @@ export const sendOTP = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    await otpService.sendAndStoreOTP(email);
-    res.status(200).json({ message: 'OTP sent successfully' });
+    // await otpService.sendAndStoreOTP(email);
+    // res.status(200).json({ message: 'OTP sent successfully' });
+        // Respond immediately
+        res.status(200).json({ message: 'OTP sent successfully' });
+
+        // Send OTP in background
+        setImmediate(async () => {
+          try {
+            await otpService.sendAndStoreOTP(email);
+          } catch (error) {
+            console.error('Error sending OTP:', error);
+          }
+        });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }

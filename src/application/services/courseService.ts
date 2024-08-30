@@ -4,7 +4,6 @@ import { ICourse } from '../../infrastructure/database/models/Course';
 import { CourseDTO, courseListingDTO, CourseTeacherDTO, mapToCourseListingDTO } from '../../interfaces/dots/CourseDTO';
 
 export const createNewCourse = async (courseData: ICourse): Promise<ICourse> => {
-  // console.log("courseData",courseData);
   return createCourse(courseData);
 };
 
@@ -30,13 +29,11 @@ export const getAllCourseDetails = async (
   page: number = 1,
   limit: number = 10
 ): Promise<courseListingDTO[]> => {
-  console.log("search: ", search, "sort: ", sort, "filter: ", filter, "page: ", page, "limit: ", limit);
   
-  // Set default values if search, sort, or filter are empty
-  const effectiveSearch = search.trim() || ''; // Default to empty string if search is empty or whitespace
-  const effectiveSort = sort.trim() || 'title'; // Default to 'title' if sort is empty or whitespace
-  const effectiveFilter = typeof filter === 'object' && Object.keys(filter).length > 0 ? filter : {}; // Default to empty object if filter is not provided or empty
-  
+  const effectiveSearch = search.trim() || '';
+  const effectiveSort = sort.trim() || 'title';
+  const effectiveFilter = typeof filter === 'object' && Object.keys(filter).length > 0 ? filter : {};
+
   // Fetch course details from the repository
   const response = await getAllCourses(effectiveSearch, effectiveSort, effectiveFilter, page, limit);
   
@@ -44,6 +41,7 @@ export const getAllCourseDetails = async (
   // Map and return the course details
   return response.map(mapToCourseListingDTO);
 };
+
 
 
 export const countDocuments = async (

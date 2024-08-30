@@ -1,17 +1,17 @@
 import { Router } from 'express';
-import { viewProfile, editProfile, changePassword } from '../controllers/profileController';
-import { createTeacherRequest, teacherRequestStatus } from '../controllers/teacher/teacherReqController';
-import { getCourses } from '../controllers/teacher/courseController';
+import { viewProfile, editProfile, changePassword } from '../../controllers/profileController';
+import { createTeacherRequest, teacherRequestStatus } from '../../controllers/teacher/teacherReqController';
+import { getCourses } from '../../controllers/teacher/courseController';
 import {
     getUserPurchasedCourses,
     checkCoursePurchased, 
     getCourseDetails, 
     CoursePurchaseHistory
-} from '../controllers/user/userCourseController';
+} from '../../controllers/user/userCourseController';
 import {
     createOrder
     , verifyOrder
-} from '../controllers/user/coursePaymentController';
+} from '../../controllers/user/coursePaymentController';
 
 
 import {
@@ -19,9 +19,9 @@ import {
     updateCourseReview,
     getCourseReviews,
     getUserReviewForCourse
-} from '../controllers/user/courseReviewController';
-import { markContentAsCompleted, markContentAsImportant, unmarkContentAsCompleted, unmarkContentAsImportant } from '../controllers/user/userProgressController';
-import { logoutUser } from '../controllers/authenticationController';
+} from '../../controllers/user/courseReviewController';
+import { markContentAsCompleted, markContentAsImportant, unmarkContentAsCompleted, unmarkContentAsImportant } from '../../controllers/user/userProgressController';
+import { logoutUser } from '../../controllers/authenticationController';
 
 const router = Router();
 

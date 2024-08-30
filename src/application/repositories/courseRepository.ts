@@ -28,24 +28,28 @@ export const getAllCourses = async (
   page: number = 1,
   limit: number = 10
 ): Promise<ICourse[]> => {
-  console.log("search: ", search, "sort: ", sort, "filter: ", filter, "page: ", page, "limit: ", limit);
   
   const skip = (page - 1) * limit;
 
-  // Determine the sort order and field
   let sortField = 'title';
-  let sortOrder = 1; // Ascending order by default
+  let sortOrder = 1;
 
   if (sort === 'high-low') {
     sortField = 'fees';
-    sortOrder = -1; // Descending order
+    sortOrder = -1;
   } else if (sort === 'low-high') {
     sortField = 'fees';
-    sortOrder = 1; // Ascending order
+    sortOrder = 1;
   } else {
-    // For other fields, sort by the provided sort string
     sortField = sort;
   }
+
+  const matchStage = {
+    'modules.modules.contents.url': { $exists: true, $ne: '' },
+    title: { $regex: search, $options: 'i' },
+    ...filter
+  };
+
 
   const courses = await Course.aggregate([
     {
@@ -56,24 +60,10 @@ export const getAllCourses = async (
         as: 'modules'
       }
     },
-    {
-      $match: {
-        'modules.modules.contents.url': { $exists: true, $ne: '' },
-        title: { $regex: search, $options: 'i' },
-        ...filter
-      }
-    },
-    {
-      $sort: {
-        [sortField]: sortOrder // Sort by the selected field and order
-      }
-    },
-    {
-      $skip: skip
-    },
-    {
-      $limit: limit
-    },
+    { $match: matchStage },
+    { $sort: { [sortField]: sortOrder } },
+    { $skip: skip },
+    { $limit: limit },
     {
       $project: {
         title: 1,
@@ -113,19 +103,16 @@ export const countDocumentsDb = async (
       ...filter // Apply additional filters
     };
 
-    console.log("Final query:", query);
 
     // If query is empty, return total document count without filtering
     if (Object.keys(query).length === 0) {
       const totalCount = await Course.estimatedDocumentCount();
-      console.log("Total count of documents:", totalCount);
       return totalCount;
     }
 
     // Count documents matching the query
     const count = await Course.countDocuments(query);
 
-    console.log("Count of matching documents:", count);
 
     return count;
   } catch (error: any) {

@@ -15,7 +15,6 @@ export const createCourse = async (req: Request, res: Response): Promise<any> =>
         // }
 
         if (!req.file) {
-            console.log("no file");
             return res.status(400).send('No file uploaded.');
         }
 
@@ -69,7 +68,6 @@ export const updateCourse = async (req: Request, res: Response): Promise<void> =
             const oldImageUrl = existingCourse.imageUrl ?? null;
             if (oldImageUrl) {
                 const publicId = oldImageUrl.split('/').pop()?.split('.')[0];
-                console.log('publicId', publicId);
 
                 if (publicId) {
                     await cloudinary.uploader.destroy(`courses/${publicId}`);
@@ -124,48 +122,32 @@ export const getCourse = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-interface FilterObj {
-    categories?: { $in: string[] };
-    price?: { $or: { $lte?: number; $gt?: number }[] };
-}
-//controller
+// http://localhost:5000/api/profile/all-courses?filter={"category":{"$in":["History"]}}
+
 export const getCourses = async (req: Request, res: Response): Promise<void> => {
     try {
-        // Extract and convert query parameters
         const search = typeof req.query.search === 'string' ? req.query.search : '';
         const sort = typeof req.query.sort === 'string' ? req.query.sort : 'title';
-        const filter = typeof req.query.filter === 'string' ? req.query.filter : '{}';
         const page = typeof req.query.page === 'string' ? parseInt(req.query.page, 10) : 1;
         const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit, 10) : 10;
-        console.log("limit: ", limit);
+        const category = typeof req.query.category === 'string' ? req.query.category : '';
+        const priceRange = typeof req.query.priceRange === 'string' ? req.query.priceRange : '';
 
-        // Convert filter string to object
-        const filterObj: FilterObj = JSON.parse(filter);
+        // Construct the filter object based on category and priceRange
+        const filterObj: any = {};
 
-        // Ensure categories and priceRange are arrays of strings
-        if (Array.isArray(req.query['limit[categories]'])) {
-            filterObj.categories = { $in: req.query['limit[categories]'] as string[] };
+        if (category) {
+            filterObj.category = { $in: category.split(',') };
         }
 
-        if (Array.isArray(req.query['limit[priceRange]'])) {
-            const priceRange = req.query['limit[priceRange]'] as string[];
-            filterObj.price = {
-                $or: priceRange.map(price => {
-                    if (price === '500 and below') return { $lte: 500 };
-                    if (price === '1000 and below') return { $lte: 1000 };
-                    if (price === '5000 and below') return { $lte: 5000 };
-                    if (price === 'Above 5000') return { $gt: 5000 };
-                    return {}; // fallback for unmatched cases
-                }).filter(condition => Object.keys(condition).length > 0) // remove empty conditions
-            };
+        if (priceRange) {
+            const [operator, value] = priceRange.split(':');
+            filterObj.fees = { [operator]: parseFloat(value) };
         }
- 
-        // Log the extracted values for debugging
-        console.log("Search:", search, "Sort:", sort, "Filter:", filterObj, "Page:", page, "Limit:", limit);
+
 
         // Get the total number of courses matching the search and filter criteria
         const totalCourses = await courseService.countDocuments(search, filterObj);
-        console.log("Total Courses:", totalCourses);
 
         // Fetch the paginated list of courses
         let courses = await courseService.getAllCourseDetails(
@@ -175,6 +157,7 @@ export const getCourses = async (req: Request, res: Response): Promise<void> => 
             page,
             limit
         );
+
         const totalPages = Math.ceil(totalCourses / limit);
 
         // Send the response
@@ -189,30 +172,28 @@ export const getCourses = async (req: Request, res: Response): Promise<void> => 
         res.status(500).json({ error: error.message });
     }
 };
- 
-        // const duplicatedCourses = Array.from({ length: 5 }, () => [...courses]);
-        // courses = duplicatedCourses.reduce((acc, curr) => acc.concat(curr), []);
-
-        // // Recalculate total courses and total pages based on the simulated dataset
-        // const simulatedTotalCourses = courses.length;
-        // const totalPages = Math.ceil(simulatedTotalCourses / limit);
-
-        // // Send the response
-        // res.status(200).json({
-        //     data: {
-        //         courses,
-        //         totalPages
-        //     }
-        // });
 
 
+// const duplicatedCourses = Array.from({ length: 5 }, () => [...courses]);
+// courses = duplicatedCourses.reduce((acc, curr) => acc.concat(curr), []);
 
- 
+// // Recalculate total courses and total pages based on the simulated dataset
+// const simulatedTotalCourses = courses.length;
+// const totalPages = Math.ceil(simulatedTotalCourses / limit);
+
+// // Send the response
+// res.status(200).json({
+//     data: {
+//         courses,
+//         totalPages
+//     }
+// });
+
+
 export const getCoursesbyTeacher = async (_req: Request, res: Response): Promise<void> => {
     try {
 
         const courses = await courseService.getAllCourseDetailsbyTeacher((_req.user as User)?.id ?? null);
-        // console.log("courses",courses);
         res.status(200).json({ data: courses });
     } catch (error: any) {
         res.status(500).json({ error: error.message });

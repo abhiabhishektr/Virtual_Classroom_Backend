@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import { errorHandler } from '../interfaces/middlewares/errorHandler';
 import { authMiddleware } from '../interfaces/middlewares/authMiddleware';
 import authenticationRoutes from '../interfaces/routes/authenticationRoutes';
-import profileRoutes from '../interfaces/routes/profileRoutes';
+import profileRoutes from '../interfaces/routes/user/profileRoutes';
 import chatRoutes from '../interfaces/routes/live&Chat/chatRoutes';
 import TeacherRoutes from '../interfaces/routes/teacher/TeacherRoutes';
 // import classroomRoutes from '../interfaces/routes/classroomRoutes';
