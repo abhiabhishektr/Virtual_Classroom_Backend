@@ -1,6 +1,6 @@
 // src/application/repositories/courseRepository.ts
 import Course from "../../infrastructure/database/models/Course";
-import {ICourse} from "../../infrastructure/database/models/Course";
+import { ICourse } from "../../infrastructure/database/models/Course";
 
 export const createCourse = async (courseData: ICourse): Promise<ICourse> => {
   const course = new Course(courseData);
@@ -28,7 +28,7 @@ export const getAllCourses = async (
   page: number = 1,
   limit: number = 10
 ): Promise<ICourse[]> => {
-  
+
   const skip = (page - 1) * limit;
 
   let sortField = 'title';
@@ -47,6 +47,7 @@ export const getAllCourses = async (
   const matchStage = {
     'modules.modules.contents.url': { $exists: true, $ne: '' },
     title: { $regex: search, $options: 'i' },
+    isBlocked: false,
     ...filter
   };
 
@@ -54,10 +55,59 @@ export const getAllCourses = async (
   const courses = await Course.aggregate([
     {
       $lookup: {
+        from: 'enrollments',
+        let: { courseId: '$_id' },
+        pipeline: [
+          { $unwind: '$courses' },
+          {
+            $match: {
+              $expr: {
+                $and: [
+                  { $eq: ['$courses.courseId', '$$courseId'] },
+                  { $eq: ['$courses.status', 'paid'] }
+                ]
+              }
+            }
+          },
+          { $group: { _id: null, isPurchased: { $first: { $literal: true } } } }
+        ],
+        as: 'enrollmentInfo'
+      }
+    },
+    {
+      $unwind: {
+        path: '$enrollmentInfo',
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $lookup: {
         from: 'modules',
         localField: '_id',
         foreignField: 'courseId',
         as: 'modules'
+      }
+    },
+    {
+      $lookup: {
+        from: 'wishlists',
+        let: { courseId: '$_id' },
+        pipeline: [
+          { $unwind: '$courses' },
+          {
+            $match: {
+              $expr: { $eq: ['$courses', '$$courseId'] }
+            }
+          },
+          { $group: { _id: null, isBookmarked: { $first: { $literal: true } } } }
+        ],
+        as: 'wishlistInfo'
+      }
+    },
+    {
+      $unwind: {
+        path: '$wishlistInfo',
+        preserveNullAndEmptyArrays: true
       }
     },
     { $match: matchStage },
@@ -76,9 +126,13 @@ export const getAllCourses = async (
         imageUrl: 1,
         isBlocked: 1,
         enrollmentCount: 1,
+        isPurchased: { $ifNull: ['$enrollmentInfo.isPurchased', false] },
+        isBookmarked: { $ifNull: ['$wishlistInfo.isBookmarked', false] }
       }
     }
   ]);
+  
+  console.log("courses: ", courses);
 
   return courses;
 };
@@ -100,6 +154,7 @@ export const countDocumentsDb = async (
     // Construct the query object
     const query: any = {
       ...(search ? { title: { $regex: search, $options: 'i' } } : {}),
+      isBlocked: false,
       ...filter // Apply additional filters
     };
 

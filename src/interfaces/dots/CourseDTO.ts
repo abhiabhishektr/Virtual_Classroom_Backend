@@ -23,6 +23,8 @@ export interface courseListingDTO {
   description: string;
   imageUrl: string;
   fees: number;
+  isPurchased:boolean
+  isBookmarked:boolean
 }
 
 export const mapToCourseListingDTO = (course: any): courseListingDTO => {
@@ -31,6 +33,8 @@ export const mapToCourseListingDTO = (course: any): courseListingDTO => {
     title: course.title,
     description: course.description,
     imageUrl: course.imageUrl,
-    fees: course.fees
+    fees: course.fees,
+    isPurchased:course.isPurchased,
+    isBookmarked:course.isBookmarked
   };
 };

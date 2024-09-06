@@ -1,8 +1,8 @@
 // backend/src/interfaces/routes/authenticationRoutes.ts
 
 import { Router } from 'express';
-import { registerUser, loginUser, loginAdmin, resendOTP, sendOTP, forgotPassword, forgotPasswordOTP, refreshToken } from '../controllers/authenticationController'; //refreshToken,verifyOTP
-import { googleAuthCallback } from '../controllers/googleAuth'
+import { registerUser, loginUser, loginAdmin, resendOTP, sendOTP, forgotPassword, forgotPasswordOTP, refreshToken } from '../../controllers/authenticationController'; //refreshToken,verifyOTP
+import { googleAuthCallback } from '../../controllers/googleAuth'
 
 
 const router = Router();

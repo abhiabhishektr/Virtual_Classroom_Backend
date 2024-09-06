@@ -1,20 +1,21 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import multer, { MulterError } from 'multer';
-import { 
-  getAllTeacherRequests, 
-  getTeacherRequestById, 
-  updateTeacherRequestStatus 
+import {
+    getAllTeacherRequests,
+    getTeacherRequestById,
+    teacherDashboardController,
+    updateTeacherRequestStatus
 } from '../../controllers/teacher/teacherReqController';
 // Middleware to handle file upload errors
 
-import { 
-  createCourse,
-  updateCourse,
-  deleteCourse,
-  getCourses,
-  getCourse,
-  getCoursesbyTeacher,
-  updateContents,
+import {
+    createCourse,
+    updateCourse,
+    deleteCourse,
+    getCourses,
+    getCourse,
+    getCoursesbyTeacher,
+    updateContents,
 } from '../../controllers/teacher/courseController';
 
 
@@ -40,7 +41,7 @@ const router = Router();
 const uploadvideo = multer({ storage: multer.memoryStorage() }).single('file');
 
 // Setup multer for handling file uploads with file size limit (e.g., 1MB)
-const upload = multer({ 
+const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 1 * 1024 * 1024 }, // 1MB limit
     fileFilter: (req, file, cb) => {
@@ -69,6 +70,9 @@ const uploadMiddleware = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
+
+router.get('/dashboard', teacherDashboardController);
+
 // Route to get a teacher request by ID
 router.get('/requests/:id', getTeacherRequestById);
 
@@ -78,7 +82,7 @@ router.post('/courses', uploadMiddleware, createCourse);
 // Route to update a course
 router.put('/courses/:id', uploadMiddleware, updateCourse);
 
-router.put('/contents/:id',  updateContents);
+router.put('/contents/:id', updateContents);
 
 router.get('/getCoursesbyTeacher', getCoursesbyTeacher);
 
@@ -86,6 +90,7 @@ router.get('/getCourseByIdTeacher/:id', getCourse);
 
 // Route to delete a course
 router.delete('/deleteCourse/:id', deleteCourse);
+
 
 
 

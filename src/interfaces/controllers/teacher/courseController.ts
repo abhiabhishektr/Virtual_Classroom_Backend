@@ -122,7 +122,6 @@ export const getCourse = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-// http://localhost:5000/api/profile/all-courses?filter={"category":{"$in":["History"]}}
 
 export const getCourses = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -211,6 +210,7 @@ export const updateContents = async (_req: Request, res: Response): Promise<void
         res.status(500).json({ error: error.message });
     }
 };
+
 
 
 

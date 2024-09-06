@@ -5,7 +5,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { errorHandler } from '../interfaces/middlewares/errorHandler';
 import { authMiddleware } from '../interfaces/middlewares/authMiddleware';
-import authenticationRoutes from '../interfaces/routes/authenticationRoutes';
+import authenticationRoutes from '../interfaces/routes/user/authenticationRoutes';
 import profileRoutes from '../interfaces/routes/user/profileRoutes';
 import chatRoutes from '../interfaces/routes/live&Chat/chatRoutes';
 import TeacherRoutes from '../interfaces/routes/teacher/TeacherRoutes';
@@ -45,7 +45,7 @@ export class App {
     // this.app.use(cors());
     this.app.use(cors({
       origin: 'http://localhost:5173', // Add your frontend URL here
-      methods: 'GET,POST,PUT,DELETE',
+      methods: 'GET,POST,PUT,DELETE,PATCH',
       credentials: true
     }));
     this.app.use(cookieParser());

@@ -5,6 +5,7 @@ import { Server } from 'http';
 import { redisClient } from './redisClient'; // Adjust the path as needed
 import { authService } from '../application/services/authService';
 import { initGroupChatController } from '../interfaces/controllers/user/groupChatController';
+import { initPushNotificationController } from '../interfaces/controllers/user/PushNotificationController';
 
 export function initSocket(server: Server) {
   const io = new SocketIOServer(server, {
@@ -22,7 +23,7 @@ export function initSocket(server: Server) {
     if (token) {
       try {
         const decoded = authService.verifyToken(token);
-        (socket as any).user = { id: decoded.id }; // Attach user info (ID) to socket object
+        (socket as any).user = { id: decoded.id ,email: decoded.email}; // Attach user info (ID) to socket object
         next();
       } catch (err) {
         console.error('Invalid token:', err);
@@ -35,6 +36,7 @@ export function initSocket(server: Server) {
 
   // Initialize the group chat controller
   initGroupChatController(io);
+  initPushNotificationController(io);
 
 
   io.on('connection', (socket) => {
@@ -46,11 +48,6 @@ export function initSocket(server: Server) {
       console.log(`User connected: user:${userId}, socket ID: ${socket.id}`);
     }
 
-    // Handle incoming messages
-    // socket.on('sendMessage', (message) => {
-    //   console.log('Received message:', message);
-    //   socket.emit('echo', `Echo: ${message}`);
-    // });
 
     socket.on('group-message', (message) => {
       console.log('Received message from group:', message);
@@ -71,7 +68,8 @@ export function initSocket(server: Server) {
 
 // Extract user ID from the socket object
 function getUserIdFromSocket(socket: any): string | null {
-  return socket.user?.id || null;
+  console.log("socket.user: ", socket.user);
+  return socket.user?.email || null;
 }
 
 

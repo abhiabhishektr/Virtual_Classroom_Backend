@@ -8,7 +8,7 @@ import { redisClient } from '../../main/redisClient';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
-const ACCESS_TOKEN_EXPIRY = '15h'; // 15 minutes 
+const ACCESS_TOKEN_EXPIRY = '15h'; // 15 hours 
 const REFRESH_TOKEN_EXPIRY = '7d'; // 7 days
 // // // testing
 // const ACCESS_TOKEN_EXPIRY = '10s'; // 30 seconds
@@ -28,7 +28,7 @@ export const authService = {
 
   },
   generateTokens: async (user: IUser): Promise<{ accessToken: string; refreshToken: string }> => {
-    const accessToken = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRY });
+    const accessToken = jwt.sign({ id: user.id, role: user.role, email: user.email }, JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRY });
     const refreshToken = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRY });
 
     await authService.storeRefreshToken(user.id, refreshToken); // Store refresh token
@@ -40,7 +40,7 @@ export const authService = {
   verifyToken: (token: string): any => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-      return decoded as { id: string, role: string }; // Return the decoded payload
+      return decoded as { id: string, role: string, email: string }; // Return the decoded payload
     } catch (err) {
       throw new Error('Invalid token');
     }

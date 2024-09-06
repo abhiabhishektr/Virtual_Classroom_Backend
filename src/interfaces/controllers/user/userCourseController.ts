@@ -7,13 +7,19 @@ import { ExtendedCourse, ICourse } from '../../../infrastructure/database/models
 import { mapToCourseListingDTO } from '../../dots/CourseDTO';
 import { createReviewRepository } from '../../../application/repositories/ReviewRepository';
 import { createReviewUseCase } from '../../../application/use-cases/user/ReviewUseCase';
-
+import { createWishlistUseCase } from '../../../application/use-cases/user/WishlistUseCase';
+import { createWishlistRepository } from '../../../application/repositories/WishlistRepository';
 
 const userRepository = createUserCourseRepository();
 const useCase = createUserCourseUseCase(userRepository);
 
 const reviewRepository = createReviewRepository();
 const reviewUseCase = createReviewUseCase(reviewRepository);
+
+const courseSaveRepository = createWishlistRepository();
+const WishlistUseCase = createWishlistUseCase(courseSaveRepository);
+
+
 
 export const getUserPurchasedCourses = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -63,8 +69,7 @@ export const getCourseDetails = async (req: Request, res: Response): Promise<voi
         // Fetch course details with contents
         const limitContents = 0; // Default limit for contents
         const { course, isPurchased, modules } = await useCase.getCourseDetailsWithContents(userId, courseId);
-        console.log("modules: ", modules[0].contents);
-        console.log("isPurchased: ", isPurchased);
+        // console.log("isPurchased: ", isPurchased);
         // console.log("course: ", course);
 
         if (!course) {
@@ -75,9 +80,9 @@ export const getCourseDetails = async (req: Request, res: Response): Promise<voi
         // If the course is purchased, fetch all contents
         const finalModules = isPurchased ? modules : modules.map(module => ({
             ...module,
-            contents: module.contents.map(content => ({ ...content, url: undefined })) // Hide URLs if not purchased
+            contents: module.contents.map((content:any) => ({ ...content, url: undefined })) // Hide URLs if not purchased
         }));
-        console.log("finalModules: ", finalModules[0].contents);
+        // console.log("finalModules: ", finalModules[0].contents);
 
         // Combine course details with additional properties
         const responseData = {
@@ -131,5 +136,30 @@ export const CoursePurchaseHistory = async (req: Request, res: Response): Promis
     } catch (error) {
         console.error('Error fetching purchase history:', error);
         res.status(500).json({ message: 'Error fetching purchase history', error });
+    }
+};
+
+
+
+export const saveToWishlistController = async (req: Request, res: Response) => {
+    const { courseId } = req.body;
+    const userId = (req.user as User)?.id;
+    try {
+        await WishlistUseCase.saveCourseToWishlist(userId, courseId);
+        return res.status(200).json({ message: 'Course saved to wishlist successfully' });
+    } catch (error) {
+        return res.status(500).json({ error: 'Failed to save course to wishlist' });
+    }
+};
+
+// Remove course from wishlist
+export const removeFromWishlistController = async (req: Request, res: Response) => {
+    const { courseId } = req.params;
+    const userId = (req.user as User)?.id;
+    try {
+        await WishlistUseCase.unsaveCourseFromWishlist(userId, courseId);
+        return res.status(200).json({ message: 'Course removed from wishlist successfully' });
+    } catch (error) {
+        return res.status(500).json({ error: 'Failed to remove course from wishlist' });
     }
 };

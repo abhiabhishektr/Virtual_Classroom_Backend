@@ -2,14 +2,20 @@
 
 import { Router } from 'express';
 // import { viewProfile, editProfile } from '../controllers/profileController';
-import { getUsers, blockUser, unblockUser } from '../../controllers/admin/adminController';
+import { getUsers, blockUser, unblockUser, getDashboardDataController } from '../../controllers/admin/adminController';
 import { getAllTeacherRequests, updateTeacherRequestStatus ,deleteTeacherRequest } from '../../controllers/teacher/teacherReqController';
 import { startLiveClass } from '../../controllers/liveClassController';
-import { getCourses } from '../../controllers/teacher/courseController';
-import { blockCourse, unblockCourse } from '../../controllers/admin/CourseControllerAdmin';
+import { blockCourse,getCourses, unblockCourse } from '../../controllers/admin/CourseControllerAdmin';
 
 const router = Router();
 
+
+//dashbord
+router.get('/dashboard', getDashboardDataController);
+
+
+
+//user management
 router.get('/getUsers', getUsers);
 router.put('/block/:id', blockUser);
 router.put('/unblock/:id', unblockUser);
@@ -21,12 +27,15 @@ router.delete('/teacher-requests/:id', deleteTeacherRequest);
 
 
 // course Management
+router.get('/courses', getCourses);
 router.patch('/courses/:courseId/block', blockCourse);
 router.patch('/courses/:courseId/unblock', unblockCourse);
-router.get('/courses', getCourses);
 
 //admin notification and other things controll
 router.post('/start-live-session', startLiveClass);
+
+
+
 
 
 

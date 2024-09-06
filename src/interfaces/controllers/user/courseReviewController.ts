@@ -19,7 +19,7 @@ export const addCourseReview = async (req: Request, res: Response): Promise<void
             return;
         }
 
-        const review: IReview = await reviewUseCase.addReview(userId, courseId, rating, comment);
+        const review: IReview | null = await reviewUseCase.addReview(userId, courseId, rating, comment);
         res.status(201).json({ message: 'Review added successfully', data: review });
     } catch (error) {
         res.status(500).json({ message: 'Error adding course review', error });

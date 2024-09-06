@@ -1,7 +1,7 @@
+// src/interfaces/controllers/user/groupChatController.ts
 import { Server, Socket } from 'socket.io';
 import { createGroupChatUseCase } from '../../../application/use-cases/groupChat/GroupChatUseCase';
 import { createGroupChatRepository } from '../../../application/repositories/GroupChatRepository';
-import { redisClient } from '../../../main/redisClient';
 
 // Initialize the GroupChatUseCase with the repository
 const groupChatRepository = createGroupChatRepository();
@@ -20,7 +20,7 @@ export const initGroupChatController = (io: Server) => {
             const senderId = (socket as any).user.id;
 
             const { roomId, senderEmail, content, name } = messagePayload;
-            console.log(`Received message from ${senderId} in room ${roomId}: ${content}`);
+            // console.log(`Received message from ${senderId} in room ${roomId}: ${content}`);
 
             try {
                 await groupChatUseCase.addMessage(roomId, senderId, content);
@@ -30,16 +30,6 @@ export const initGroupChatController = (io: Server) => {
             }
         });
 
-        socket.on('disconnect', async () => {
-            console.log('User disconnected:', socket.id);
-            const userId = getUserIdFromSocket(socket);
-            if (userId) {
-                await redisClient.del(`user:${userId}`);
-            }
-        });
     });
 };
 
-const getUserIdFromSocket = (socket: Socket): string | null => {
-    return (socket as any).user?.id || null;
-};

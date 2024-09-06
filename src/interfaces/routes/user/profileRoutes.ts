@@ -6,7 +6,9 @@ import {
     getUserPurchasedCourses,
     checkCoursePurchased, 
     getCourseDetails, 
-    CoursePurchaseHistory
+    CoursePurchaseHistory,
+    saveToWishlistController,
+    removeFromWishlistController
 } from '../../controllers/user/userCourseController';
 import {
     createOrder
@@ -22,6 +24,7 @@ import {
 } from '../../controllers/user/courseReviewController';
 import { markContentAsCompleted, markContentAsImportant, unmarkContentAsCompleted, unmarkContentAsImportant } from '../../controllers/user/userProgressController';
 import { logoutUser } from '../../controllers/authenticationController';
+import { notificationController } from '../../controllers/user/PushNotificationController';
 
 const router = Router();
 
@@ -51,13 +54,19 @@ router.put('/:courseId/reviews/:reviewId', updateCourseReview);
 router.get('/:courseId/reviews', getCourseReviews);
 router.get('/:courseId/reviews/user', getUserReviewForCourse); //(not using now)
 
+//User Notification Routes
+router.use('/notifications', notificationController);
+
 //paymet
 router.post('/payment/orders', createOrder);
 router.post('/payment/verify', verifyOrder);
 
+// Course Bookark
+router.get('/allbookmark',  saveToWishlistController);  // Save course to wishlist
+router.post('/wishlist/save',  saveToWishlistController);  // Save course to wishlist
+router.delete('/wishlist/unsave/:courseId',removeFromWishlistController)
 
-
-
+ 
 // mark import content & checkbox bookmark
 router.post('/content/:contentId/complete', markContentAsCompleted);
 router.post('/content/:contentId/uncomplete', unmarkContentAsCompleted);
@@ -69,3 +78,15 @@ router.post('/content/:contentId/unimportant', unmarkContentAsImportant);
 
 router.post('/logout', logoutUser);
 export default router;
+
+
+
+// Notification seen status
+// router.post('/notifications', NotificationController.createNotification);
+// router.get('/notifications/:userId', NotificationController.getUserNotifications);
+// router.put('/notifications/:userId/:notificationId/seen', NotificationController.markAsSeen);
+// router.get('/notifications/:userId/:notificationId/status', NotificationController.getNotificationStatus);
+// NotificationStatusRepository.ts
+// NotificationUseCase.ts
+// NotificationController.ts
+// schema

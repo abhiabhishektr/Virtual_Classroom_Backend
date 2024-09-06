@@ -8,12 +8,12 @@ import { googleLogin } from '../../application/use-cases/authentication/register
 const oauth2Client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID!,
   process.env.GOOGLE_CLIENT_SECRET!,
-  'http://localhost:5173'   
+  'http://localhost:5173'
 );
 
 export const googleAuthCallback = async (req: Request, res: Response) => {
-   
-    
+
+
   const { code } = req.body; // Authorization code should be in query parameters
 
   if (!code || typeof code !== 'string') {
@@ -38,22 +38,22 @@ export const googleAuthCallback = async (req: Request, res: Response) => {
     const email = userInfo.emailAddresses?.[0]?.value || '';
     const name = userInfo.names?.[0]?.displayName || 'No name';
     const googleId = userInfo.resourceName?.split('/')[1] ?? ''; // Extract googleId from resourceName
-    console.log("google id",googleId);
-    
+    console.log("google id", googleId);
+
     const profilePicture = userInfo.photos?.[0]?.url || 'No profile picture';
 
-    const googleTokens  = await googleLogin({ email, name, googleId,profilePicture });
+    const googleTokens = await googleLogin({ email, name, googleId, profilePicture });
 
     res.json({
-        success: true,
-        token : googleTokens,
-        user: {
-          name,
-          email,
-          profilePicture,
-        }
-      });
-    } catch (error) {
+      success: true,
+      token: googleTokens,
+      user: {
+        name,
+        email,
+        profilePicture,
+      }
+    });
+  } catch (error) {
     console.error('Authentication error:', error);
     res.status(500).json({ error: 'Authentication failed' });
   }
