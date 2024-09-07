@@ -30,7 +30,7 @@ export const getUserPurchasedCourses = async (req: Request, res: Response): Prom
         }
         const courses = await useCase.getUserPurchasedCourses(userId);
 
-        res.status(200).json({data: {courses:courses.map(mapToCourseListingDTO)}});
+        res.status(200).json({ data: { courses: courses.map(mapToCourseListingDTO) } });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching purchased courses', error });
     }
@@ -80,7 +80,7 @@ export const getCourseDetails = async (req: Request, res: Response): Promise<voi
         // If the course is purchased, fetch all contents
         const finalModules = isPurchased ? modules : modules.map(module => ({
             ...module,
-            contents: module.contents.map((content:any) => ({ ...content, url: undefined })) // Hide URLs if not purchased
+            contents: module.contents.map((content: any) => ({ ...content, url: undefined })) // Hide URLs if not purchased
         }));
         // console.log("finalModules: ", finalModules[0].contents);
 
@@ -155,11 +155,35 @@ export const saveToWishlistController = async (req: Request, res: Response) => {
 // Remove course from wishlist
 export const removeFromWishlistController = async (req: Request, res: Response) => {
     const { courseId } = req.params;
+    console.log("courseId: ", courseId);
     const userId = (req.user as User)?.id;
     try {
         await WishlistUseCase.unsaveCourseFromWishlist(userId, courseId);
         return res.status(200).json({ message: 'Course removed from wishlist successfully' });
     } catch (error) {
         return res.status(500).json({ error: 'Failed to remove course from wishlist' });
+    }
+};
+
+export const allbookmark = async (req: Request, res: Response) => {
+    const userId = (req.user as User)?.id;
+    console.log("userId: ", userId);
+    try {
+        const wishlistItems = await WishlistUseCase.getAllWishlistItems(userId);
+        return res.status(200).json({
+            data: wishlistItems
+        });
+    } catch (error) {
+        return res.status(500).json({ error: 'Failed to retrieve wishlist items' });
+    }
+};
+
+export const removePurchasedItemsFromWishlist = async (req: Request, res: Response) => {
+    const userId = (req.user as User)?.id;
+    try {
+        await WishlistUseCase.clearPurchasedItems(userId);
+        return res.status(200).json({ message: 'Purchased items removed from wishlist successfully' });
+    } catch (error) {
+        return res.status(500).json({ error: 'Failed to remove purchased items from wishlist' });
     }
 };

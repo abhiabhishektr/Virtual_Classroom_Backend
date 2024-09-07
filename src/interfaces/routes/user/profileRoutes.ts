@@ -8,7 +8,9 @@ import {
     getCourseDetails, 
     CoursePurchaseHistory,
     saveToWishlistController,
-    removeFromWishlistController
+    removeFromWishlistController,
+    allbookmark,
+    removePurchasedItemsFromWishlist
 } from '../../controllers/user/userCourseController';
 import {
     createOrder
@@ -62,7 +64,8 @@ router.post('/payment/orders', createOrder);
 router.post('/payment/verify', verifyOrder);
 
 // Course Bookark
-router.get('/allbookmark',  saveToWishlistController);  // Save course to wishlist
+router.get('/allbookmark',  allbookmark);  // Save course to wishlist
+router.delete('/allbookmark',  removePurchasedItemsFromWishlist);  // Save course to wishlist
 router.post('/wishlist/save',  saveToWishlistController);  // Save course to wishlist
 router.delete('/wishlist/unsave/:courseId',removeFromWishlistController)
 

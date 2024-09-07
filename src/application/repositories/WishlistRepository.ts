@@ -11,7 +11,7 @@ export interface IWishlistRepository {
 
 export const createWishlistRepository = (): IWishlistRepository => ({
     saveCourseToWishlist: async (userId: string, courseId: string): Promise<IWishlist | null> => {
-        let wishlist = await Wishlist.findOne({ userId:  mongoose.Types.ObjectId(userId) });
+        let wishlist = await Wishlist.findOne({ userId: mongoose.Types.ObjectId(userId) });
 
         const courseObjectId = mongoose.Types.ObjectId(courseId); // Convert courseId to ObjectId
 
@@ -30,16 +30,73 @@ export const createWishlistRepository = (): IWishlistRepository => ({
             { userId: mongoose.Types.ObjectId(userId) },
             { $pull: { courses: mongoose.Types.ObjectId(courseId) } }
         );
-    
-        if (result.nModified === 0) {  
-            return null; 
+
+        if (result.nModified === 0) {
+            return null;
         } else {
-            const updatedWishlist = await Wishlist.findOne({ userId: mongoose.Types.ObjectId(userId) }); 
+            const updatedWishlist = await Wishlist.findOne({ userId: mongoose.Types.ObjectId(userId) });
             return updatedWishlist;
         }
     },
-    getAllWishlistItems: async (userId: string): Promise<IWishlist | null> => {
-        const wishlist = await Wishlist.findOne({ userId: mongoose.Types.ObjectId(userId) }).populate('courses'); // Populate courses
+    getAllWishlistItems: async (userId: string): Promise<Object | null> => {
+        const userIdObj = mongoose.Types.ObjectId(userId);
+        const wishlist = await Wishlist.aggregate([
+            {
+                $match: { userId:userIdObj}
+            },
+            {
+                $unwind: '$courses'
+            },
+            {
+                $lookup: {
+                    from: 'courses',
+                    localField: 'courses',
+                    foreignField: '_id',
+                    as: 'courseDetails'
+                }
+            },
+            {
+                $unwind: '$courseDetails'
+            },
+            {
+                $lookup: {
+                    from: 'enrollments',
+                    let: { userId: '$userId', courseId: '$courseDetails._id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$userId', '$$userId'] },
+                                        { $eq: ['$courses.courseId', '$$courseId'] },
+                                        { $eq: ['$courses.status', 'paid'] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'enrollment'
+                }
+            },
+            {
+                $project: {
+                    id: '$courseDetails._id',
+                    title: '$courseDetails.title',
+                    description: '$courseDetails.description',
+                    imageUrl: '$courseDetails.imageUrl',
+                    fees: '$courseDetails.fees',
+                    isPurchased: {
+                        $cond: {
+                            if: { $gt: [{ $size: '$enrollment' }, 0] },
+                            then: true,
+                            else: false
+                        }
+                    },
+                    isBookmarked: { $literal: true }
+                }
+            }
+        ]);
+        console.log("wishlist: ", wishlist);
         return wishlist;
     },
 
@@ -52,8 +109,8 @@ export const createWishlistRepository = (): IWishlistRepository => ({
         wishlist.courses = wishlist.courses.filter(courseId => {
             // Assuming you have a way to determine if a course is purchased (e.g., isPurchased flag in the course document)
             const course = await // Fetch the course document by courseId
-              // ... your logic to fetch the course ...
-            return !course.isPurchased; 
+            // ... your logic to fetch the course ...
+            return !course.isPurchased;
         });
 
         await wishlist.save();
