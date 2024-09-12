@@ -5,7 +5,7 @@ import { Router } from 'express';
 import { getUsers, blockUser, unblockUser, getDashboardDataController } from '../../controllers/admin/adminController';
 import { getAllTeacherRequests, updateTeacherRequestStatus ,deleteTeacherRequest } from '../../controllers/teacher/teacherReqController';
 import { startLiveClass } from '../../controllers/liveClassController';
-import { blockCourse,getCourses, unblockCourse } from '../../controllers/admin/CourseControllerAdmin';
+import { blockCourse,getCourses, report, unblockCourse } from '../../controllers/admin/CourseControllerAdmin';
 
 const router = Router();
 
@@ -35,7 +35,8 @@ router.patch('/courses/:courseId/unblock', unblockCourse);
 router.post('/start-live-session', startLiveClass);
 
 
-
+//reports view admin 
+router.get('/getreportIssue', report);
 
 
 

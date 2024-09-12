@@ -6,11 +6,12 @@ import { redisClient } from './redisClient'; // Adjust the path as needed
 import { authService } from '../application/services/authService';
 import { initGroupChatController } from '../interfaces/controllers/user/groupChatController';
 import { initPushNotificationController } from '../interfaces/controllers/user/PushNotificationController';
+import { DEFAULT_FRONTEND_LINK } from '../utils/Constants';
 
 export function initSocket(server: Server) {
   const io = new SocketIOServer(server, {
     cors: {
-      origin: 'http://localhost:5173', // Your frontend URL
+      origin: DEFAULT_FRONTEND_LINK, // Your frontend URL
       methods: ['GET', 'POST'],
       credentials: true,
     },

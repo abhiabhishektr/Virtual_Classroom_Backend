@@ -19,6 +19,7 @@ import { User } from '../types/user';
 import { authAndTeacherMiddleware } from '../interfaces/middlewares/teacherAuthMiddleware';
 import { mockAuthMiddleware } from '../interfaces/middlewares/mockAuthMiddleware';
 import passport from 'passport';
+import { DEFAULT_FRONTEND_LINK } from '../utils/Constants';
 const cookieParser = require('cookie-parser');
 
 
@@ -44,7 +45,7 @@ export class App {
   private configureMiddleware(): void {
     // this.app.use(cors());
     this.app.use(cors({
-      origin: 'http://localhost:5173', // Add your frontend URL here
+      origin: DEFAULT_FRONTEND_LINK, // Add your frontend URL here
       methods: 'GET,POST,PUT,DELETE,PATCH',
       credentials: true
     }));

@@ -1,6 +1,7 @@
 // src/application/repositories/WishlistRepository.ts
 import mongoose from 'mongoose';
 import { Wishlist, IWishlist } from '../../infrastructure/database/models/Wishlist';
+import Enrollment from '../../infrastructure/database/models/Enrollment';
 
 export interface IWishlistRepository {
     saveCourseToWishlist(userId: string, courseId: string): Promise<IWishlist | null>;
@@ -38,7 +39,7 @@ export const createWishlistRepository = (): IWishlistRepository => ({
             return updatedWishlist;
         }
     },
-    getAllWishlistItems: async (userId: string): Promise<Object | null> => {
+    getAllWishlistItems: async (userId: string): Promise<any | null> => {
         const userIdObj = mongoose.Types.ObjectId(userId);
         const wishlist = await Wishlist.aggregate([
             {
@@ -100,19 +101,28 @@ export const createWishlistRepository = (): IWishlistRepository => ({
         return wishlist;
     },
 
-    clearPurchasedItems: async (userId: string): Promise<IWishlist | null> => {
+    clearPurchasedItems:  async (userId: string): Promise<IWishlist | null> => {
         const wishlist = await Wishlist.findOne({ userId: mongoose.Types.ObjectId(userId) });
         if (!wishlist) {
             return null;
         }
-
+    
+        // Fetch the user's enrollment details
+        const enrollment = await Enrollment.findOne({ userId: mongoose.Types.ObjectId(userId) });
+        if (!enrollment) {
+            return wishlist; // If there's no enrollment, return the wishlist as it is
+        }
+    
+        // Extract the purchased course IDs
+        const purchasedCourseIds = enrollment.courses
+            .filter(courseDetail => courseDetail.status === 'paid')
+            .map(courseDetail => courseDetail.courseId.toString());
+    
+        // Filter out purchased courses from the wishlist
         wishlist.courses = wishlist.courses.filter(courseId => {
-            // Assuming you have a way to determine if a course is purchased (e.g., isPurchased flag in the course document)
-            const course = await // Fetch the course document by courseId
-            // ... your logic to fetch the course ...
-            return !course.isPurchased;
+            return !purchasedCourseIds.includes(courseId.toString());
         });
-
+    
         await wishlist.save();
         return wishlist;
     }

@@ -9,6 +9,8 @@ import { createReviewRepository } from '../../../application/repositories/Review
 import { createReviewUseCase } from '../../../application/use-cases/user/ReviewUseCase';
 import { createWishlistUseCase } from '../../../application/use-cases/user/WishlistUseCase';
 import { createWishlistRepository } from '../../../application/repositories/WishlistRepository';
+import { createReportIssueRepository } from '../../../application/repositories/reportIssueRepository';
+import { createReportIssueUseCase } from '../../../application/use-cases/user/reportIssueUseCase';
 
 const userRepository = createUserCourseRepository();
 const useCase = createUserCourseUseCase(userRepository);
@@ -18,6 +20,9 @@ const reviewUseCase = createReviewUseCase(reviewRepository);
 
 const courseSaveRepository = createWishlistRepository();
 const WishlistUseCase = createWishlistUseCase(courseSaveRepository);
+
+const reportRepository = createReportIssueRepository();
+const reporttUseCase = createReportIssueUseCase(reportRepository);
 
 
 
@@ -187,3 +192,15 @@ export const removePurchasedItemsFromWishlist = async (req: Request, res: Respon
         return res.status(500).json({ error: 'Failed to remove purchased items from wishlist' });
     }
 };
+
+
+
+export const report = async (req: Request, res: Response) => {
+    const userId = (req.user as User)?.id;
+    try {
+        reporttUseCase.saveReport(userId, req.body.courseId, req.body.issueType, req.body.description);
+        return res.status(200).json({ message: 'Report submitted successfully' });
+    } catch (error) {
+        return res.status(500).json({ error: 'Failed to submit report' });
+    }
+  };

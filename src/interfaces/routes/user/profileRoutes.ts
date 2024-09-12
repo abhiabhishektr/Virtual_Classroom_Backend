@@ -10,7 +10,8 @@ import {
     saveToWishlistController,
     removeFromWishlistController,
     allbookmark,
-    removePurchasedItemsFromWishlist
+    removePurchasedItemsFromWishlist,
+    report
 } from '../../controllers/user/userCourseController';
 import {
     createOrder
@@ -75,6 +76,9 @@ router.post('/content/:contentId/complete', markContentAsCompleted);
 router.post('/content/:contentId/uncomplete', unmarkContentAsCompleted);
 router.post('/content/:contentId/important', markContentAsImportant);
 router.post('/content/:contentId/unimportant', unmarkContentAsImportant);
+
+// course report 
+router.post('/reportIssue', report);
 
 
 

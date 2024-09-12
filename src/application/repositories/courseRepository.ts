@@ -132,7 +132,6 @@ export const getAllCourses = async (
     }
   ]);
   
-  console.log("courses: ", courses);
 
   return courses;
 };

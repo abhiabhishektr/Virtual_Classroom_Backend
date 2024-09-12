@@ -4,11 +4,12 @@ import { Request, Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import { google } from 'googleapis';
 import { googleLogin } from '../../application/use-cases/authentication/registerUser';
+import { DEFAULT_FRONTEND_LINK } from '../../utils/Constants';
 
 const oauth2Client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID!,
   process.env.GOOGLE_CLIENT_SECRET!,
-  'http://localhost:5173'
+  DEFAULT_FRONTEND_LINK
 );
 
 export const googleAuthCallback = async (req: Request, res: Response) => {
