@@ -205,7 +205,7 @@ export const createCourseContentRepository = (): ICourseContentRepository => ({
         const updatedModule = await ModuleModel.findOneAndUpdate(
             {
                 _id: courseIdObj,
-                courseId: chapterIdObj,
+                courseId:  chapterIdObj,
                 'modules._id': moduleIdObj
             },
             { $set: { 'modules.$.title': newTitle } },
