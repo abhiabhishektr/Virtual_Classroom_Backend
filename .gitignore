@@ -10,3 +10,6 @@ dist/
 
 
 
+file.md
+app-secret.yaml
+app.secret.yaml
