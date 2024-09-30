@@ -43,12 +43,18 @@ export class App {
   }
 
   private configureMiddleware(): void {
-    // this.app.use(cors());
+    this.app.use(cors());
+    // this.app.use(cors({
+    //   origin: DEFAULT_FRONTEND_LINK, 
+    //   methods: 'GET,POST,PUT,DELETE,PATCH',
+    //   credentials: true
+    // }));
     this.app.use(cors({
       origin: DEFAULT_FRONTEND_LINK, // Add your frontend URL here
       methods: 'GET,POST,PUT,DELETE,PATCH',
       credentials: true
     }));
+
     this.app.use(cookieParser());
     this.app.use(passport.initialize());
     this.app.use(morgan('dev')); //  dev-log format  

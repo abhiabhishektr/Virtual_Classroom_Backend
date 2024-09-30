@@ -1,0 +1,13 @@
+# .dockerignore
+.vscode/
+
+dist/
+
+.env
+
+node_modules/
+
+NOTES.md
+test.ts
+test.c
+file.md

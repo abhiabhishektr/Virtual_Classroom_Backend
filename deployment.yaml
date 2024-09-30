@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+      - name: app
+        image: abhishekabtr/zobackend
+        ports:
+        - containerPort: 5000 # Ensure your application listens on this port
+        envFrom:
+        - secretRef:
+            name: app-secret # Reference to the secret for environment variables
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  selector:
+    app: app # Selector to match the deployment
+  ports:
+    - protocol: TCP
+      port: 3000 # Port exposed externally
+      targetPort: 5000 # Port on which the container is listening
+      nodePort: 30001
+  type: NodePort  # Make sure your environment supports LoadBalancer
