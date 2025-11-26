@@ -1,5 +1,9 @@
 .env
 node_modules
+package-lock.json
+npm-debug.log
+yarn.lock
+yarn-error.log
 NOTES.md
 test.ts
 test.c

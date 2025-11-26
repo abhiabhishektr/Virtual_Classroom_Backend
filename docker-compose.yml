@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # MongoDB Service
+  mongodb:
+    image: mongo:6.0
+    container_name: vclassroom-mongodb
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    networks:
+      - vclassroom-network
+
+  # Redis Service
+  redis:
+    image: redis:7-alpine
+    container_name: vclassroom-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - vclassroom-network
+
+  # Backend Service (optional - uncomment to run backend in Docker)
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: vclassroom-backend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5000:5000"
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     - mongodb
+  #     - redis
+  #   volumes:
+  #     - ./src:/app/src
+  #   networks:
+  #     - vclassroom-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  vclassroom-network:
+    driver: bridge

@@ -7,7 +7,7 @@
       "start": "node dist/main/server.js",
       "build": "tsc",
       "dev": "concurrently \"tsc -w\" \"nodemon dist/main/server.js -d 2\"",
-      "prestart": "yarn build"
+      "prestart": "npm run build"
     },
    "dependencies": {
       "@types/mongodb": "^4.0.7",
